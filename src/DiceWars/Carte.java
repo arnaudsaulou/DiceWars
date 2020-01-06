@@ -1,7 +1,5 @@
 package DiceWars;
 
-import javafx.util.Pair;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,11 +11,17 @@ import java.util.Scanner;
 
 public class Carte {
 
+    //region Variables
+
     private int height;
     private int widht;
     private boolean[][] territoires;
-    private HashMap<Pair<Integer, Integer>, Integer> nbDiceByTerritoire; //IdTerritoire <> NbDice
-    private HashMap<Pair<Integer, Integer>, Integer> ownerTerritoire; //IdTerritoire <> IdJoueur
+    private HashMap<Coordinates, Integer> nbDiceByTerritoire;   //Coordinates <> NbDice
+    private HashMap<Coordinates, Joueur> ownerTerritoire;       //Coordinates <> Joueur
+
+    //endregion
+
+    //region Constructor
 
     public Carte(int height, int widht) {
         this.height = height;
@@ -26,6 +30,10 @@ public class Carte {
         this.nbDiceByTerritoire = new HashMap<>();
         this.ownerTerritoire = new HashMap<>();
     }
+
+    //endregion
+
+    //region Utils
 
     /**
      * Import a carte from a CSV file.
@@ -51,7 +59,7 @@ public class Carte {
                 lineNumber++;
             }
         } catch (ArrayIndexOutOfBoundsException e) {
-            System.err.println("");
+            System.err.println();
         } catch (InputMismatchException e) {
             System.err.println("Format de carte invalide");
         } catch (IOException e) {
@@ -59,17 +67,55 @@ public class Carte {
         }
     }
 
+    //endregion
 
-    protected ArrayList<Pair<Integer, Integer>> getNeighbours(Pair<Integer, Integer> idTerritoire) {
-        ArrayList<Pair<Integer, Integer>> neighbours = new ArrayList<>();
+    //region Setter
 
-        int row = idTerritoire.getKey();
-        int column = idTerritoire.getValue();
+    /**
+     * Set a number of dices on a territory
+     *
+     * @param coordinatesTerritoire Coordinates of the territory
+     * @param nbDice                Number of dices to set
+     */
+    protected void setNbDiceOnTerritoire(Coordinates coordinatesTerritoire, int nbDice) {
+        this.nbDiceByTerritoire.put(coordinatesTerritoire, nbDice);
+    }
 
-        for (int y = Math.max(0, row - 1); y <= Math.min(this.height - 1, row + 1); y++) {
-            for (int x = Math.max(0, column - 1); x <= Math.min(this.widht - 1, column + 1); x++) {
-                if (x != column || y != row) {
-                    neighbours.add(new Pair<>(y, x));
+    /**
+     * Set a Joueur as the owner of the territory
+     *
+     * @param coordinatesTerritoire Coordinates of the territory
+     * @param owner                 The owner to set
+     */
+    protected void setOwnerTerritoire(Coordinates coordinatesTerritoire, Joueur owner) {
+        this.ownerTerritoire.put(coordinatesTerritoire, owner);
+    }
+
+    //endregion
+
+    //region Getter
+
+    /**
+     * Get coordinates of neighbors territories
+     *
+     * @param coordinatesTerritoire Coordinates of the origin territory
+     * @return ArrayList containing all coordinates of neighbors territories
+     */
+    protected ArrayList<Coordinates> getNeighbors(Coordinates coordinatesTerritoire) {
+        ArrayList<Coordinates> neighbours = new ArrayList<>();
+
+        int row = coordinatesTerritoire.getX();
+        int column = coordinatesTerritoire.getY();
+
+        //Search upper, at the same level and lower
+        for (int x = Math.max(0, row - 1); x <= Math.min(this.height - 1, row + 1); x++) {
+
+            //Search left, in the middle and right
+            for (int y = Math.max(0, column - 1); y <= Math.min(this.widht - 1, column + 1); y++) {
+
+                //If it's not the origin territory
+                if (x != row || y != column) {
+                    neighbours.add(new Coordinates(x, y));
                 }
             }
         }
@@ -77,30 +123,89 @@ public class Carte {
         return neighbours;
     }
 
-    protected int getNbDiceOnTerritoire(Pair<Integer, Integer> idTerritoire) {
-        return this.nbDiceByTerritoire.get(idTerritoire);
+    /**
+     * Get the number of dices on a territory
+     *
+     * @param coordinatesTerritoire Coordinates of the territory
+     * @return The number of dice present
+     */
+    protected int getNbDiceOnTerritoire(Coordinates coordinatesTerritoire) {
+        return this.nbDiceByTerritoire.get(coordinatesTerritoire);
     }
 
-    protected void setNbDiceOnTerritoire(Pair<Integer, Integer> idTerritoire, int nbDice) {
-        this.nbDiceByTerritoire.put(idTerritoire, nbDice);
+    /**
+     * Get the owner of a territory
+     *
+     * @param coordinatesTerritoire Coordinates of the territory
+     * @return The owner (type Joueur)
+     */
+    protected Joueur getOwnerTerritoire(Coordinates coordinatesTerritoire) {
+        return this.ownerTerritoire.get(coordinatesTerritoire);
     }
 
-    protected int getOwnerTerritoire(Pair<Integer, Integer> idTerritoire) {
-        return this.ownerTerritoire.get(idTerritoire);
+    /**
+     * Get the two dimensions array representing territories
+     *
+     * @return The two dimensions array
+     */
+    public boolean[][] getTerritoires() {
+        return this.territoires;
     }
 
-    protected void setOwnerTerritoire(Pair<Integer, Integer> idTerritoire, int idOwner) {
-        this.ownerTerritoire.put(idTerritoire, idOwner);
+    /**
+     * Get the number of territories player can play with
+     *
+     * @return The number of territories
+     */
+    public int getNbTerritoiresPlayable() {
+        int nbTerritoires = 0;
+
+        for (boolean[] territoiresRow : this.territoires) {
+            for (boolean territoire : territoiresRow) {
+                if (territoire)
+                    nbTerritoires++;
+            }
+        }
+
+        return nbTerritoires;
     }
 
+    /**
+     * Get total height of the map
+     *
+     * @return The height of the map
+     */
+    public int getHeight() {
+        return height;
+    }
+
+    /**
+     * Get total width of the map
+     *
+     * @return The width of the map
+     */
+    public int getWidht() {
+        return widht;
+    }
+
+    //endregion
+
+    //region Override
 
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (boolean[] rowTerritoires : this.territoires) {
-            for (Boolean territoire : rowTerritoires) {
-                stringBuilder.append(territoire);
+        for (int x = 0; x < this.widht; x++) {
+            for (int y = 0; y < this.height; y++) {
+                if (this.territoires[x][y]) {
+                    stringBuilder.append(this.ownerTerritoire.get(new Coordinates(x, y)).getId());
+                    stringBuilder.append(" - ");
+                    stringBuilder.append(this.nbDiceByTerritoire.get(new Coordinates(x, y)));
+                } else {
+                    stringBuilder.append("  #  ");
+                }
+
                 stringBuilder.append(" | ");
             }
             stringBuilder.append('\n');
@@ -108,4 +213,6 @@ public class Carte {
 
         return stringBuilder.toString();
     }
+
+    //endregion
 }

@@ -1,16 +1,17 @@
 package DiceWars;
 
-import javafx.util.Pair;
-
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Partie {
 
+    //region Variables
+
     private static ArrayList<Joueur> joueurs;
-    private static Carte carte;
     private static Scanner keyboard;
+
+    //endregion
 
     public static void main(String[] args) {
 
@@ -18,13 +19,28 @@ public class Partie {
 
         keyboard = new Scanner(System.in);
 
-        carte = new Carte(5, 5);
-        carte.importCarteFromCSV(askUserCarteToImportPath());
+        Carte carte = new Carte(4, 4);
 
-        System.out.println(carte);
+        //TODO
+        //carte.importCarteFromCSV(askUserCarteToImportPath());
+        carte.importCarteFromCSV("C:\\Users\\Arnaud\\Documents\\Cours\\L3\\Java2\\DiceWars\\res\\Carte1.csv");
 
-        System.out.println(carte.getNeighbours(new Pair<>(1, 3)));
+        if (carte.getNbTerritoiresPlayable() < joueurs.size()) {
+            throw new IllegalStateException("Plus de joueur que de territoires");
+        } else if (carte.getNbTerritoiresPlayable() % joueurs.size() != 0) {
+            throw new IllegalStateException("Le nombre de territoires n'est pas un multiple du nombre de joueurs");
+        }
+
+        //System.out.println(carte);
+
+        //System.out.println(carte.getNeighbours(new Coordinates(1, 3)));
+
+        new Jeux(joueurs, carte);
+
+        System.out.println("\n" + carte);
     }
+
+    //region Utils
 
     private static void initializeJoueurs(String arg) {
         try {
@@ -44,4 +60,6 @@ public class Partie {
         System.out.print("Entrer le chemin d'accès da la carte à importer : ");
         return keyboard.nextLine();
     }
+
+    //endregion
 }
