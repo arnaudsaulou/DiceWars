@@ -9,17 +9,18 @@ public class Partie {
     //region Variables
 
     private static ArrayList<Joueur> joueurs;
+    private static Carte carte;
     private static Scanner keyboard;
 
     //endregion
 
     public static void main(String[] args) {
 
-        initializeJoueurs(args[0]);
-
         keyboard = new Scanner(System.in);
 
-        Carte carte = new Carte(4, 4);
+        carte = new Carte(4, 4);
+
+        initializeJoueurs(args[0]);
 
         //TODO
         //carte.importCarteFromCSV(askUserCarteToImportPath());
@@ -31,23 +32,37 @@ public class Partie {
             throw new IllegalStateException("Le nombre de territoires n'est pas un multiple du nombre de joueurs");
         }
 
-        //System.out.println(carte);
+        Jeux jeux = new Jeux(joueurs, carte);
 
-        //System.out.println(carte.getNeighbours(new Coordinates(1, 3)));
-
-        new Jeux(joueurs, carte);
-
-        System.out.println("\n" + carte);
+        lunchPartie();
     }
 
     //region Utils
+
+    private static void lunchPartie() {
+        int indexNextJoueur = 0;
+        Joueur nextJoueur = joueurs.get(indexNextJoueur);
+
+        System.out.println("\n" + carte);
+
+        while (true) {
+
+            System.out.println(carte.getMaxContiguousTerritories(nextJoueur));
+
+            nextJoueur.jouer();
+            System.out.println("\n" + carte);
+
+            indexNextJoueur++;
+            nextJoueur = joueurs.get(indexNextJoueur % joueurs.size());
+        }
+    }
 
     private static void initializeJoueurs(String arg) {
         try {
             int nbJoueur = Integer.parseInt(arg);
             joueurs = new ArrayList<>(nbJoueur);
             for (int i = 0; i < nbJoueur; i++) {
-                joueurs.add(new Joueur(keyboard));
+                joueurs.add(new Joueur(keyboard, carte));
             }
 
         } catch (InputMismatchException | ArrayIndexOutOfBoundsException e) {

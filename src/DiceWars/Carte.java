@@ -23,10 +23,10 @@ public class Carte {
 
     //region Constructor
 
-    public Carte(int height, int widht) {
+    public Carte(int widht, int height) {
         this.height = height;
         this.widht = widht;
-        this.territoires = new boolean[this.height][this.widht];
+        this.territoires = new boolean[this.widht][this.height];
         this.nbDiceByTerritoire = new HashMap<>();
         this.ownerTerritoire = new HashMap<>();
     }
@@ -78,6 +78,7 @@ public class Carte {
      * @param nbDice                Number of dices to set
      */
     protected void setNbDiceOnTerritoire(Coordinates coordinatesTerritoire, int nbDice) {
+        this.nbDiceByTerritoire.remove(coordinatesTerritoire);
         this.nbDiceByTerritoire.put(coordinatesTerritoire, nbDice);
     }
 
@@ -88,6 +89,7 @@ public class Carte {
      * @param owner                 The owner to set
      */
     protected void setOwnerTerritoire(Coordinates coordinatesTerritoire, Joueur owner) {
+        this.ownerTerritoire.remove(coordinatesTerritoire);
         this.ownerTerritoire.put(coordinatesTerritoire, owner);
     }
 
@@ -104,23 +106,68 @@ public class Carte {
     protected ArrayList<Coordinates> getNeighbors(Coordinates coordinatesTerritoire) {
         ArrayList<Coordinates> neighbours = new ArrayList<>();
 
-        int row = coordinatesTerritoire.getX();
-        int column = coordinatesTerritoire.getY();
+        int row = coordinatesTerritoire.getY();
+        int column = coordinatesTerritoire.getX();
 
         //Search upper, at the same level and lower
-        for (int x = Math.max(0, row - 1); x <= Math.min(this.height - 1, row + 1); x++) {
+        for (int y = Math.max(0, row - 1); y <= Math.min(this.height - 1, row + 1); y++) {
 
             //Search left, in the middle and right
-            for (int y = Math.max(0, column - 1); y <= Math.min(this.widht - 1, column + 1); y++) {
+            for (int x = Math.max(0, column - 1); x <= Math.min(this.widht - 1, column + 1); x++) {
 
-                //If it's not the origin territory
-                if (x != row || y != column) {
+                //If it's not the origin territory and the terittoires is playable
+                if ((x != column || y != row) && this.territoires[x][y]) {
                     neighbours.add(new Coordinates(x, y));
                 }
             }
         }
 
         return neighbours;
+    }
+
+    protected int getMaxContiguousTerritories(Joueur joueur) {
+
+        int maxContiguousTerritories = 0;
+
+        for (Coordinates territoire : this.getTerritoiresOfPlayer(joueur)) {
+            maxContiguousTerritories = Math.max(maxContiguousTerritories,
+                    this.computeContiguousTerritories(territoire, new ArrayList<>()));
+        }
+
+        return maxContiguousTerritories;
+    }
+
+    protected ArrayList<Coordinates> getTerritoiresOfPlayer(Joueur joueur) {
+
+        ArrayList<Coordinates> territoiresOfPlayer = new ArrayList<>();
+
+        for (Coordinates territoire : this.ownerTerritoire.keySet()) {
+            if (this.ownerTerritoire.get(territoire) == joueur) {
+                territoiresOfPlayer.add(territoire);
+            }
+        }
+
+        return territoiresOfPlayer;
+    }
+
+
+    private int computeContiguousTerritories(Coordinates coordinatesTerritoire, ArrayList<Coordinates> territoiresVisited) {
+
+        int maxContiguousTerritories = 0;
+
+        ArrayList<Coordinates> neighbors = this.getNeighbors(coordinatesTerritoire);
+
+        for (Coordinates neighbor : neighbors) {
+
+            if (this.ownerTerritoire.get(coordinatesTerritoire) == this.ownerTerritoire.get(neighbor) &&
+                    !territoiresVisited.contains(neighbor)) {
+                territoiresVisited.add(neighbor);
+                maxContiguousTerritories += this.computeContiguousTerritories(neighbor, territoiresVisited) + 1;
+            } else
+                maxContiguousTerritories += 0;
+        }
+
+        return maxContiguousTerritories;
     }
 
     /**
@@ -196,8 +243,8 @@ public class Carte {
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (int x = 0; x < this.widht; x++) {
-            for (int y = 0; y < this.height; y++) {
+        for (int y = 0; y < this.height; y++) {
+            for (int x = 0; x < this.widht; x++) {
                 if (this.territoires[x][y]) {
                     stringBuilder.append(this.ownerTerritoire.get(new Coordinates(x, y)).getId());
                     stringBuilder.append(" - ");

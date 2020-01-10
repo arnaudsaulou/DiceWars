@@ -48,5 +48,13 @@ public class Coordinates {
         return Objects.hash(this.getX(), this.getY());
     }
 
+    @Override
+    public String toString() {
+        return "Coordinates{" +
+                "x=" + x +
+                ", y=" + y +
+                '}';
+    }
+
     //endregion
 }
