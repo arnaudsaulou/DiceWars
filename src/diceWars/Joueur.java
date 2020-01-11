@@ -1,5 +1,10 @@
 package diceWars;
 
+import diceWars.exceptions.BelongingTerritoryException;
+import diceWars.exceptions.NonNeighboringTerritoryException;
+import diceWars.exceptions.NotBelongingTerritoryException;
+import diceWars.exceptions.OneDiceTerritoryException;
+
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -44,7 +49,7 @@ public class Joueur {
 
         do {
 
-            System.out.println("\n" + this.jeux.getCarte());
+            System.out.println("\n\n" + this.jeux.getCarte());
 
             System.out.println("/////////////////////////////////////////////");
             System.out.println("//////    Joueur " + (this.id + 1) + " a toi de jouer !    ////// ");
@@ -94,14 +99,18 @@ public class Joueur {
 
             if (this.jeux.getCarte().isCoordinatesValid(coordinatesAttacking) &&
                     this.jeux.getCarte().isCoordinatesValid(coordinatesAttacked))
-                throw new IllegalArgumentException("Coordonnées invalide");
-            else
                 this.attaquer(coordinatesAttacking, coordinatesAttacked);
+            else
+                System.err.println("Coordonnée invalide");
+
         } catch (InputMismatchException e) {
             System.err.println("Coordonnée invalide");
+        } catch (BelongingTerritoryException |
+                OneDiceTerritoryException |
+                NotBelongingTerritoryException |
+                NonNeighboringTerritoryException e) {
+            System.err.println(e.getMessage());
         }
-
-
     }
 
     private Coordinates askCoordinate(String msg) {
@@ -121,7 +130,8 @@ public class Joueur {
      * @param coordinatesTerritoireAttaquant The attacking territory
      * @param coordinatesTerritoireAttaque   The attacked territory
      */
-    protected void attaquer(Coordinates coordinatesTerritoireAttaquant, Coordinates coordinatesTerritoireAttaque) {
+    protected void attaquer(Coordinates coordinatesTerritoireAttaquant, Coordinates coordinatesTerritoireAttaque)
+            throws BelongingTerritoryException, NonNeighboringTerritoryException, OneDiceTerritoryException, NotBelongingTerritoryException {
 
         int nbDiceOnTerritoireAttaquant = this.jeux.getCarte().getNbDiceOnTerritoire(coordinatesTerritoireAttaquant);
         int nbDiceOnTerritoireAttaque = this.jeux.getCarte().getNbDiceOnTerritoire(coordinatesTerritoireAttaque);
@@ -138,15 +148,15 @@ public class Joueur {
                                 this
                         );
                     } else
-                        System.out.println("Attaque impossible : le territoire attaqué vous appartient !");
+                        throw new BelongingTerritoryException();
                 } else
-                    System.out.println("Attaque impossible : territoire non voisin !");
+                    throw new NonNeighboringTerritoryException();
             } else
-                System.out.println("Attaque impossible : territoire contenant un seul dé !");
+                throw new OneDiceTerritoryException();
         } else
-            System.out.println("Attaque imposible : le territoire attaquant ne vous appartient pas !");
-
+            throw new NotBelongingTerritoryException();
     }
+
 
     /**
      * Add one to the number of territories owned

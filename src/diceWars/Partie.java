@@ -9,7 +9,6 @@ public class Partie {
     //region Variables
 
     private static ArrayList<Joueur> joueurs;
-    private static Carte carte;
     private static Scanner keyboard;
     private static Jeux jeux;
 
@@ -19,7 +18,7 @@ public class Partie {
 
         keyboard = new Scanner(System.in);
 
-        carte = new Carte(4, 4);
+        Carte carte = new Carte(4, 4);
 
         joueurs = initializeJoueurs(args[0]);
 
@@ -55,7 +54,7 @@ public class Partie {
 
     private static ArrayList<Joueur> initializeJoueurs(String arg) {
 
-        ArrayList<Joueur> listJoueur = new ArrayList<Joueur>();
+        ArrayList<Joueur> listJoueur = new ArrayList<>();
 
         try {
             int nbJoueur = Integer.parseInt(arg);

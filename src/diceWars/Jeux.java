@@ -13,8 +13,8 @@ public class Jeux {
 
     //region Variables
 
-    private int nbJoueurs;
-    private ArrayList<Joueur> joueurs;
+    private final int nbJoueurs;
+    private final ArrayList<Joueur> joueurs;
     private final Carte carte;
     private final Random random;
     private boolean isGameOver;

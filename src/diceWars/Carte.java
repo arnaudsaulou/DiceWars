@@ -48,6 +48,7 @@ public class Carte {
             Path path = Paths.get(carteToImportPath);
             long lineCount = Files.lines(path).count();
             scanner = new Scanner(path);
+
             System.out.println("\nImportation en cours !");
 
             int lineNumber = 1;
@@ -55,6 +56,8 @@ public class Carte {
                 this.extractDataFromLineRead(scanner, lineCount, lineNumber);
                 lineNumber++;
             }
+            System.out.println("Importation réussie !");
+
         } catch (ArrayIndexOutOfBoundsException e) {
             System.err.println();
         } catch (InputMismatchException e) {
@@ -90,11 +93,11 @@ public class Carte {
      * @return A boolean, true if coordinates ok, false else
      */
     protected boolean isCoordinatesValid(Coordinates coordinates) {
-        return coordinates.getX() < 0 ||
-                coordinates.getX() > this.widht - 1 ||
-                coordinates.getY() < 0 ||
-                coordinates.getY() > this.height - 1 ||
-                !this.getTerritoires()[coordinates.getX()][coordinates.getY()];
+        return coordinates.getX() >= 0 &&
+                coordinates.getX() < this.widht &&
+                coordinates.getY() >= 0 &&
+                coordinates.getY() < this.height &&
+                this.getTerritoires()[coordinates.getX()][coordinates.getY()];
     }
 
     //endregion
