@@ -1,4 +1,4 @@
-package DiceWars;
+package diceWars;
 
 import java.util.ArrayList;
 import java.util.InputMismatchException;
@@ -11,6 +11,7 @@ public class Partie {
     private static ArrayList<Joueur> joueurs;
     private static Carte carte;
     private static Scanner keyboard;
+    private static Jeux jeux;
 
     //endregion
 
@@ -20,7 +21,7 @@ public class Partie {
 
         carte = new Carte(4, 4);
 
-        initializeJoueurs(args[0]);
+        joueurs = initializeJoueurs(args[0]);
 
         //TODO
         //carte.importCarteFromCSV(askUserCarteToImportPath());
@@ -32,7 +33,7 @@ public class Partie {
             throw new IllegalStateException("Le nombre de territoires n'est pas un multiple du nombre de joueurs");
         }
 
-        Jeux jeux = new Jeux(joueurs, carte);
+        jeux = new Jeux(carte, joueurs);
 
         lunchPartie();
     }
@@ -43,32 +44,31 @@ public class Partie {
         int indexNextJoueur = 0;
         Joueur nextJoueur = joueurs.get(indexNextJoueur);
 
-        System.out.println("\n" + carte);
-
-        while (true) {
-
-            System.out.println(carte.getMaxContiguousTerritories(nextJoueur));
-
+        while (jeux.isGameNotOver()) {
             nextJoueur.jouer();
-            System.out.println("\n" + carte);
-
             indexNextJoueur++;
             nextJoueur = joueurs.get(indexNextJoueur % joueurs.size());
         }
+
+
     }
 
-    private static void initializeJoueurs(String arg) {
+    private static ArrayList<Joueur> initializeJoueurs(String arg) {
+
+        ArrayList<Joueur> listJoueur = new ArrayList<Joueur>();
+
         try {
             int nbJoueur = Integer.parseInt(arg);
-            joueurs = new ArrayList<>(nbJoueur);
             for (int i = 0; i < nbJoueur; i++) {
-                joueurs.add(new Joueur(keyboard, carte));
+                listJoueur.add(new Joueur(jeux, keyboard));
             }
 
         } catch (InputMismatchException | ArrayIndexOutOfBoundsException e) {
             System.err.println("Nombre de joueur invalide, veuillez réessayer");
             System.exit(151);
         }
+
+        return listJoueur;
     }
 
     private static String askUserCarteToImportPath() {

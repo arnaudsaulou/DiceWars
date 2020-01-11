@@ -1,4 +1,4 @@
-package DiceWars;
+package diceWars;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,11 +13,11 @@ public class Carte {
 
     //region Variables
 
-    private int height;
-    private int widht;
-    private boolean[][] territoires;
-    private HashMap<Coordinates, Integer> nbDiceByTerritoire;   //Coordinates <> NbDice
-    private HashMap<Coordinates, Joueur> ownerTerritoire;       //Coordinates <> Joueur
+    private final int height;
+    private final int widht;
+    private final boolean[][] territoires;
+    private final HashMap<Coordinates, Integer> nbDiceByTerritoire;   //Coordinates <> NbDice
+    private final HashMap<Coordinates, Joueur> ownerTerritoire;       //Coordinates <> Joueur
 
     //endregion
 
@@ -42,20 +42,17 @@ public class Carte {
      */
     protected void importCarteFromCSV(String carteToImportPath) {
 
+        Scanner scanner = null;
+
         try {
             Path path = Paths.get(carteToImportPath);
             long lineCount = Files.lines(path).count();
-            Scanner scanner = new Scanner(path);
+            scanner = new Scanner(path);
             System.out.println("\nImportation en cours !");
 
             int lineNumber = 1;
             while (scanner.hasNext()) {
-                System.out.println("Importation : [ " + lineNumber + " / " + lineCount + " ]");
-                String[] territoireArray = scanner.nextLine().split(";");
-
-                //Set a territoires
-                this.territoires[Integer.parseInt(territoireArray[0])][Integer.parseInt(territoireArray[1])] = true;
-
+                this.extractDataFromLineRead(scanner, lineCount, lineNumber);
                 lineNumber++;
             }
         } catch (ArrayIndexOutOfBoundsException e) {
@@ -64,7 +61,40 @@ public class Carte {
             System.err.println("Format de carte invalide");
         } catch (IOException e) {
             System.err.println("Fichier introuvable");
+        } finally {
+            assert scanner != null;
+            scanner.close();
         }
+    }
+
+
+    /**
+     * Extract data from the read line and make the corresponding territory playable (territoires[x][y] = True)
+     *
+     * @param scanner    The scanner object that read the CSV file
+     * @param lineCount  The current line read
+     * @param lineNumber The total number of line to read
+     */
+    private void extractDataFromLineRead(Scanner scanner, long lineCount, int lineNumber) {
+        System.out.println("Importation : [ " + lineNumber + " / " + lineCount + " ]");
+        String[] territoireArray = scanner.nextLine().split(";");
+
+        //Set a territoires
+        this.territoires[Integer.parseInt(territoireArray[0])][Integer.parseInt(territoireArray[1])] = true;
+    }
+
+    /**
+     * Check if a coordinates are valid : in the dimensions of the map and on a playable territory
+     *
+     * @param coordinates Coordinates to check
+     * @return A boolean, true if coordinates ok, false else
+     */
+    protected boolean isCoordinatesValid(Coordinates coordinates) {
+        return coordinates.getX() < 0 ||
+                coordinates.getX() > this.widht - 1 ||
+                coordinates.getY() < 0 ||
+                coordinates.getY() > this.height - 1 ||
+                !this.getTerritoires()[coordinates.getX()][coordinates.getY()];
     }
 
     //endregion
@@ -125,18 +155,12 @@ public class Carte {
         return neighbours;
     }
 
-    protected int getMaxContiguousTerritories(Joueur joueur) {
-
-        int maxContiguousTerritories = 0;
-
-        for (Coordinates territoire : this.getTerritoiresOfPlayer(joueur)) {
-            maxContiguousTerritories = Math.max(maxContiguousTerritories,
-                    this.computeContiguousTerritories(territoire, new ArrayList<>()));
-        }
-
-        return maxContiguousTerritories;
-    }
-
+    /**
+     * Get list of territories owned by a player
+     *
+     * @param joueur The player
+     * @return The list of territories owned
+     */
     protected ArrayList<Coordinates> getTerritoiresOfPlayer(Joueur joueur) {
 
         ArrayList<Coordinates> territoiresOfPlayer = new ArrayList<>();
@@ -150,7 +174,31 @@ public class Carte {
         return territoiresOfPlayer;
     }
 
+    /**
+     * Entire process to return the max number of contiguous territories owned by a player
+     *
+     * @param joueur The player
+     * @return The number of contiguous territories max
+     */
+    protected int getMaxContiguousTerritories(Joueur joueur) {
 
+        int maxContiguousTerritories = 0;
+
+        for (Coordinates territoire : this.getTerritoiresOfPlayer(joueur)) {
+            maxContiguousTerritories = Math.max(maxContiguousTerritories,
+                    this.computeContiguousTerritories(territoire, new ArrayList<>()));
+        }
+
+        return maxContiguousTerritories;
+    }
+
+    /**
+     * Compute recursively the number of contiguous territories starting from a specified territory
+     *
+     * @param coordinatesTerritoire The starting territory
+     * @param territoiresVisited    The list of territories already visited
+     * @return The number of contiguous territories around the starting territory
+     */
     private int computeContiguousTerritories(Coordinates coordinatesTerritoire, ArrayList<Coordinates> territoiresVisited) {
 
         int maxContiguousTerritories = 0;

@@ -1,4 +1,4 @@
-package DiceWars;
+package diceWars;
 
 import java.util.Objects;
 
@@ -6,8 +6,8 @@ public class Coordinates {
 
     //region Variables
 
-    private int x;
-    private int y;
+    private final int x;
+    private final int y;
 
     //endregion
 

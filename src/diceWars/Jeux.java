@@ -1,4 +1,4 @@
-package DiceWars;
+package diceWars;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -15,46 +15,70 @@ public class Jeux {
 
     private int nbJoueurs;
     private ArrayList<Joueur> joueurs;
-    private static Carte carte;
-    private static Random random;
+    private final Carte carte;
+    private final Random random;
+    private boolean isGameOver;
 
     //endregion
 
     //region Constructor
 
-    public Jeux(ArrayList<Joueur> joueurs, Carte carte) {
+    public Jeux(Carte carte, ArrayList<Joueur> joueurs) {
+        this.carte = carte;
         this.joueurs = joueurs;
         this.nbJoueurs = this.joueurs.size();
-        Jeux.carte = carte;
-        random = new Random();
+        this.isGameOver = false;
+        this.random = new Random();
         this.allocateTerritoires();
+
+        //Associate jeux to joueur
+        for (Joueur joueur : joueurs) {
+            joueur.setJeux(this);
+        }
     }
 
     //endregion
 
     //region Allocation territoires
 
-    protected static int throwDices(int nbDice) {
+    /**
+     * Throw the number of dices pass in parameters and return the sum of the each dice result
+     *
+     * @param nbDice Number of dices ro play with
+     * @return The sum of the each dice result
+     */
+    protected int throwDices(int nbDice) {
         int result = 0;
 
         for (int diceNumber = 0; diceNumber < nbDice; diceNumber++)
-            result += aleatoire();
+            result += this.aleatoire();
 
         return result;
     }
 
-    private static int aleatoire() {
-        return random.nextInt(5) + 1;
+    /**
+     * Simulate a random dice throw
+     *
+     * @return A random value between 1 and 6
+     */
+    private int aleatoire() {
+        return this.random.nextInt(5) + 1;
     }
 
-    public static void distributeSupportDices(Joueur joueur, int supportDices) {
+    /**
+     * Distribute a number of dice on random territories owned by a player
+     *
+     * @param joueur       The player to give support dices
+     * @param supportDices The number of support dices to distribute
+     */
+    public void distributeSupportDices(Joueur joueur, int supportDices) {
 
-        ArrayList<Coordinates> territoiresOfPlayer = carte.getTerritoiresOfPlayer(joueur);
+        ArrayList<Coordinates> territoiresOfPlayer = this.carte.getTerritoiresOfPlayer(joueur);
 
         while (supportDices > 0) {
             Coordinates choosenTerritoire = territoiresOfPlayer.get(random.nextInt(territoiresOfPlayer.size()));
 
-            if (carte.getNbDiceOnTerritoire(choosenTerritoire) + 1 <= NB_MAX_DICE_PER_TERRITOIRES) {
+            if (this.carte.getNbDiceOnTerritoire(choosenTerritoire) + 1 <= NB_MAX_DICE_PER_TERRITOIRES) {
                 carte.setNbDiceOnTerritoire(choosenTerritoire, carte.getNbDiceOnTerritoire(choosenTerritoire) + 1);
                 supportDices--;
             }
@@ -226,6 +250,59 @@ public class Jeux {
             //Go to next index
             indexTerritoire++;
         }
+    }
+
+    //endregion
+
+    //region Game logic
+
+    /**
+     * Throw dice for attacking and attacked territory and depending on the result, apply the rules of the games
+     *
+     * @param coordinatesTerritoireAttaquant Coordinates attacking territory
+     * @param coordinatesTerritoireAttaque   Coordinates attacked territory
+     * @param nbDiceOnTerritoireAttaquant    Number of dices on the attacking territory
+     * @param nbDiceOnTerritoireAttaque      Number of dices on the attacked territory
+     * @param joueur                         The current player
+     */
+    protected void determineWinner(Coordinates coordinatesTerritoireAttaquant,
+                                   Coordinates coordinatesTerritoireAttaque,
+                                   int nbDiceOnTerritoireAttaquant,
+                                   int nbDiceOnTerritoireAttaque,
+                                   Joueur joueur) {
+        int scoreTerritoireAttaquant = this.throwDices(nbDiceOnTerritoireAttaquant);
+        int scoreTerritoireAttaque = this.throwDices(nbDiceOnTerritoireAttaque);
+
+        carte.setNbDiceOnTerritoire(coordinatesTerritoireAttaquant, 1);
+
+        if (scoreTerritoireAttaquant > scoreTerritoireAttaque) {
+            carte.setNbDiceOnTerritoire(coordinatesTerritoireAttaque, nbDiceOnTerritoireAttaque + nbDiceOnTerritoireAttaquant - 1);
+            carte.setOwnerTerritoire(coordinatesTerritoireAttaque, joueur);
+            System.out.println("L'attaquant à gagné !");
+        } else {
+            System.out.println("Le défenseur à gagné !");
+        }
+
+        this.checkIsGameOver(joueur);
+    }
+
+
+    protected boolean isGameNotOver() {
+        return !this.isGameOver;
+    }
+
+    protected void checkIsGameOver(Joueur joueur) {
+        this.isGameOver = carte.getNbTerritoiresPlayable() == carte.getTerritoiresOfPlayer(joueur).size();
+        if (this.isGameOver)
+            System.out.println("Joueur " + joueur.getId() + " a gagner la partie !");
+    }
+
+    //endregion
+
+    //region Getter
+
+    public Carte getCarte() {
+        return this.carte;
     }
 
     //endregion
