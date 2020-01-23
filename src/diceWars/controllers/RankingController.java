@@ -2,7 +2,7 @@ package diceWars.controllers;
 
 import diceWars.DiceWars;
 import diceWars.models.AbstractModel;
-import diceWars.models.Joueur;
+import diceWars.models.Jeux;
 import diceWars.models.Partie;
 import diceWars.models.Ranking;
 import diceWars.views.AbstractView;
@@ -24,15 +24,6 @@ public class RankingController extends AbstractController {
         this.ranking = (Ranking) ranking;
         this.rankingView = (RankingView) rankingView;
 
-        String[] columnNames = {"Joueur", "Nombre de territoires"};
-
-        JTable jTable = new JTable(this.constructRankinObject(), columnNames);
-        jTable.setDefaultEditor(Object.class, null);
-        jTable.setRowHeight(50);
-        jTable.setFont(new Font("ARIAL", Font.PLAIN, 20));
-
-        this.rankingView.getCenterPanel().add(jTable, BorderLayout.CENTER);
-
         this.rankingView.getQuit().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -44,7 +35,7 @@ public class RankingController extends AbstractController {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 DiceWars.applicationController.resetPartie();
-                DiceWars.applicationController.lunchPartie(Partie.MODE.SOLO);
+                DiceWars.applicationController.lunchPartie(Partie.MODE.SOLO, -1);
             }
         });
     }
@@ -53,7 +44,7 @@ public class RankingController extends AbstractController {
         String[][] ranking = new String[this.ranking.getJoueurList().size()][2];
 
         for (int i = 0; i < this.ranking.getJoueurList().size(); i++) {
-            ranking[i][0] = "Joueur " + this.ranking.getJoueurList().get(i).getId();
+            ranking[i][0] = "Joueur " + (this.ranking.getJoueurList().get(i).getId() + 1);
             ranking[i][1] = String.valueOf(this.ranking.getJoueurList().get(i).getNbTerritoiresOwned());
         }
 
@@ -61,4 +52,17 @@ public class RankingController extends AbstractController {
 
     }
 
+    public void updateRanking() {
+        String[] columnNames = {"Joueur", "Nombre de territoires"};
+
+        JTable jTable = new JTable(this.constructRankinObject(), columnNames);
+        jTable.setDefaultEditor(Object.class, null);
+        jTable.setRowHeight(50);
+        jTable.setFont(new Font("ARIAL", Font.PLAIN, 20));
+
+        this.rankingView.getCenterPanel().add(jTable, BorderLayout.CENTER);
+
+        Jeux jeux = (Jeux) DiceWars.applicationController.getGameController().getModel();
+        this.rankingView.getWinnerName().setText("Joueur " + (jeux.getLastWinner().getId() + 1));
+    }
 }

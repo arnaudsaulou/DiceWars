@@ -1,12 +1,17 @@
 package diceWars.controllers;
 
 import diceWars.DiceWars;
-import diceWars.models.*;
+import diceWars.models.AbstractModel;
+import diceWars.models.Coordinates;
+import diceWars.models.Jeux;
 import diceWars.models.exceptions.BelongingTerritoryException;
 import diceWars.models.exceptions.NonNeighboringTerritoryException;
 import diceWars.models.exceptions.NotBelongingTerritoryException;
 import diceWars.models.exceptions.OneDiceTerritoryException;
-import diceWars.views.*;
+import diceWars.views.AbstractView;
+import diceWars.views.DialogError;
+import diceWars.views.GameView;
+import diceWars.views.ScoresView;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -47,6 +52,7 @@ public class GameController extends AbstractController {
                     );
                     DiceWars.applicationController.getMapController().updateMap();
                 } else {
+                    DiceWars.applicationController.getRankingController().updateRanking();
                     DiceWars.applicationController.changeView(
                             DiceWars.applicationController.getRankingController().getView()
                     );

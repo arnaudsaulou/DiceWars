@@ -1,16 +1,17 @@
 package diceWars.models;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
-public class Partie {
+public class Partie extends AbstractModel {
 
     //region Constants
 
     public enum MODE {SOLO, MULTI}
 
-    ;
-    public static Color[] COLOR = {Color.BLUE,Color.GREEN,Color.RED,Color.MAGENTA,Color.ORANGE,Color.PINK,Color.YELLOW};
+    public static Color[] COLOR = {Color.BLUE, Color.GREEN, Color.RED, Color.MAGENTA, Color.ORANGE, Color.PINK, Color.YELLOW};
     public static Set<Color> COLOR_USED = new HashSet<>();
 
     //endregion
@@ -23,11 +24,11 @@ public class Partie {
 
     //endregion
 
-    public Partie(String args) throws IllegalStateException {
+    public Partie(int nbPlayer) throws IllegalStateException {
 
-        Carte carte = new Carte(40 , 40);
+        Carte carte = new Carte(25, 25);
 
-        this.joueurs = initializeJoueurs(args);
+        this.joueurs = initializeJoueurs(nbPlayer);
 
         //TODO
         //carte.importCarteFromCSV(askUserCarteToImportPath());
@@ -44,28 +45,16 @@ public class Partie {
 
     //region Utils
 
-    public void lunchPartie(MODE mode) {
-        this.mode = mode;
-    }
-
-    private ArrayList<Joueur> initializeJoueurs(String arg) throws IllegalStateException {
+    private ArrayList<Joueur> initializeJoueurs(int nbPlayer) throws IllegalStateException {
 
         ArrayList<Joueur> listJoueur = new ArrayList<>();
 
-        try {
-            int nbJoueur = Integer.parseInt(arg);
-
-            if (nbJoueur <= COLOR.length) {
-                for (int i = 0; i < nbJoueur; i++) {
-                    listJoueur.add(new Joueur(this.jeux));
-                }
-            } else {
-                throw new IllegalStateException("Trop de joueur (max : " + COLOR.length + ")");
+        if (nbPlayer <= COLOR.length) {
+            for (int i = 0; i < nbPlayer; i++) {
+                listJoueur.add(new Joueur(this.jeux));
             }
-
-        } catch (InputMismatchException | ArrayIndexOutOfBoundsException e) {
-            System.err.println("Nombre de joueur invalide, veuillez réessayer");
-            System.exit(151);
+        } else {
+            throw new IllegalStateException("Trop de joueur (max : " + COLOR.length + ")");
         }
 
         return listJoueur;

@@ -7,6 +7,7 @@ public class RankingView extends AbstractView {
     private JButton restart;
     private JButton quit;
     private JPanel centerPanel;
+    private JLabel winnerName;
 
 
     public RankingView() {
@@ -25,6 +26,10 @@ public class RankingView extends AbstractView {
 
     public JPanel getCenterPanel() {
         return centerPanel;
+    }
+
+    public JLabel getWinnerName() {
+        return winnerName;
     }
 
     //endregion

@@ -8,12 +8,16 @@ import java.awt.event.KeyEvent;
 
 public class ApplicationView extends JFrame {
 
-    public ApplicationView(String title) throws HeadlessException {
-        super(title);
+    public ApplicationView() throws HeadlessException {
+        super("Dice Ware");
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        //this.setUndecorated(true);
+        this.setUndecorated(true);
         this.setupEscapeKeyPressedDetection();
         this.setPreferredSize(new Dimension(500, 500));
+
+        //Display the splashscreen on startup
+        this.setContentPane(new SplashscreenView());
+
         this.setVisible(true);
     }
 
@@ -35,8 +39,8 @@ public class ApplicationView extends JFrame {
 
     public void changeContentPane(Container contentPane) {
         this.getContentPane().removeAll();
-        this.getContentPane().add(contentPane);
+        this.setContentPane(contentPane);
         this.getContentPane().repaint();
-        this.getContentPane().validate();
+        this.getContentPane().revalidate();
     }
 }

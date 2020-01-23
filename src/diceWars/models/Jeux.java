@@ -267,11 +267,9 @@ public class Jeux extends AbstractModel {
      * Procedure to end the round
      */
     public void endRound() {
-        System.out.println("Start");
         int supportDices = this.carte.getMaxContiguousTerritories(this.nextJoueur);
         this.distributeSupportDices(this.nextJoueur, supportDices);
         this.nextJoueur = this.joueurs.get((this.joueurs.indexOf(this.nextJoueur) + 1) % this.joueurs.size());
-        System.out.println("End");
     }
 
     /**
@@ -295,18 +293,23 @@ public class Jeux extends AbstractModel {
         carte.setNbDiceOnTerritoire(coordinatesTerritoireAttaquant, 1);
 
         if (scoreTerritoireAttaquant > scoreTerritoireAttaque) {
+            this.updateNbTerritoryOwned(joueur, carte.getOwnerTerritoire(coordinatesTerritoireAttaque));
+
             carte.setNbDiceOnTerritoire(coordinatesTerritoireAttaque, nbDiceOnTerritoireAttaque + nbDiceOnTerritoireAttaquant - 1);
             carte.setOwnerTerritoire(coordinatesTerritoireAttaque, joueur);
-            joueur.incremetNbTerritoiresOwned();
             this.lastWinner = joueur;
         } else {
-            joueur.decremetNbTerritoiresOwned();
             this.lastWinner = carte.getOwnerTerritoire(coordinatesTerritoireAttaque);
         }
 
         this.checkIsGameOver(joueur);
 
         return new int[]{scoreTerritoireAttaquant, scoreTerritoireAttaque};
+    }
+
+    private void updateNbTerritoryOwned(Joueur winner, Joueur looser) {
+        winner.incremetNbTerritoiresOwned();
+        looser.decremetNbTerritoiresOwned();
     }
 
     public boolean isGameNotOver() {

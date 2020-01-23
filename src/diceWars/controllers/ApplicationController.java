@@ -1,35 +1,31 @@
 package diceWars.controllers;
 
 import diceWars.interfaces.Displayable;
-import diceWars.models.*;
-import diceWars.views.ApplicationView;
-import diceWars.views.GameView;
-import diceWars.views.MapView;
-import diceWars.views.RankingView;
+import diceWars.models.Joueur;
+import diceWars.models.Partie;
+import diceWars.models.Ranking;
+import diceWars.views.*;
 
 import java.util.Comparator;
 
 public class ApplicationController {
 
     private final ApplicationView applicationView;
-    private final GameController gameController;
-    private final MapController mapController;
-    private final RankingController rankingController;
-    private final String nbJoueur;
+    private final MenuController menuController;
+    private GameController gameController;
+    private MapController mapController;
+    private RankingController rankingController;
 
     private Partie partie;
 
-    public ApplicationController(String nbJoueur) {
-        this.nbJoueur = nbJoueur;
+    public ApplicationController() {
+        this.applicationView = new ApplicationView();
+        this.menuController = new MenuController(null, new MenuView());
+    }
 
-        this.applicationView = new ApplicationView("DiceWars");
+    private void setUpPartie(int nbPlayer) throws IllegalStateException {
 
-        try {
-            this.partie = new Partie(this.nbJoueur);
-        } catch (IllegalStateException e) {
-            System.err.println(e.getMessage());
-            System.exit(152);
-        }
+        this.partie = new Partie(nbPlayer);
 
         this.mapController = new MapController(
                 this.partie.getJeux().getCarte(),
@@ -59,16 +55,13 @@ public class ApplicationController {
         this.mapController.updateMap();
     }
 
-    public void lunchPartie(Partie.MODE mode) {
-
-        if (mode.equals(Partie.MODE.SOLO)) {
-            this.changeView(this.gameController.getView());
+    public void lunchPartie(Partie.MODE mode, int nbPlayer) throws IllegalStateException {
+        if (nbPlayer == -1) {
+            this.setUpPartie(this.partie.getJoueurs().size());
         } else {
-            //TODO
+            this.setUpPartie(nbPlayer);
         }
-        this.partie.lunchPartie(mode);
-
-
+        this.changeView(this.gameController.getView());
     }
 
     public void changeView(Displayable displayable) {
@@ -80,14 +73,22 @@ public class ApplicationController {
     }
 
     public GameController getGameController() {
-        return gameController;
+        return this.gameController;
     }
 
     public MapController getMapController() {
-        return mapController;
+        return this.mapController;
     }
 
     public RankingController getRankingController() {
-        return rankingController;
+        return this.rankingController;
+    }
+
+    public ApplicationView getApplicationView() {
+        return this.applicationView;
+    }
+
+    public MenuController getMenuController() {
+        return menuController;
     }
 }
