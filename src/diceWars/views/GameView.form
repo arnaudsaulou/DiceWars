@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="diceWars.views.GameView">
+  <grid id="27dc6" binding="gameViewPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="20" y="20" width="663" height="400"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <grid id="18902" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="East"/>
+        <properties>
+          <preferredSize width="200" height="140"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <component id="ef779" class="javax.swing.JButton" binding="endRoundButton">
+            <constraints border-constraint="North"/>
+            <properties>
+              <preferredSize width="200" height="30"/>
+              <text value="FIN DU TOUR"/>
+            </properties>
+          </component>
+          <component id="40cd4" class="javax.swing.JTextArea" binding="actionsHistoryTextArea">
+            <constraints border-constraint="Center"/>
+            <properties>
+              <editable value="false"/>
+              <preferredSize width="200" height="50"/>
+              <wrapStyleWord value="true"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <grid id="15dc1" binding="mapViewPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="Center"/>
+        <properties>
+          <preferredSize width="40" height="40"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <grid id="f9810" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
+            <constraints border-constraint="North"/>
+            <properties>
+              <minimumSize width="20" height="20"/>
+              <preferredSize width="20" height="20"/>
+            </properties>
+            <border type="none"/>
+            <children/>
+          </grid>
+          <grid id="16699" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
+            <constraints border-constraint="East"/>
+            <properties>
+              <minimumSize width="20" height="20"/>
+              <preferredSize width="20" height="20"/>
+            </properties>
+            <border type="none"/>
+            <children/>
+          </grid>
+          <grid id="4f0fe" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
+            <constraints border-constraint="South"/>
+            <properties>
+              <minimumSize width="20" height="20"/>
+              <preferredSize width="20" height="20"/>
+            </properties>
+            <border type="none"/>
+            <children/>
+          </grid>
+          <grid id="4fb4f" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
+            <constraints border-constraint="West"/>
+            <properties>
+              <minimumSize width="20" height="20"/>
+              <preferredSize width="20" height="20"/>
+            </properties>
+            <border type="none"/>
+            <children/>
+          </grid>
+        </children>
+      </grid>
+      <grid id="95c93" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+        <constraints border-constraint="North"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="4474" class="javax.swing.JLabel">
+            <constraints/>
+            <properties>
+              <font size="48"/>
+              <text value="Joueur"/>
+            </properties>
+          </component>
+          <component id="fb849" class="javax.swing.JLabel" binding="title_idPlayer">
+            <constraints/>
+            <properties>
+              <font size="48"/>
+              <text value="id"/>
+            </properties>
+          </component>
+          <component id="16415" class="javax.swing.JLabel">
+            <constraints/>
+            <properties>
+              <font size="48"/>
+              <text value="("/>
+            </properties>
+          </component>
+          <grid id="12095" binding="playersColor" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
+            <constraints/>
+            <properties>
+              <maximumSize width="50" height="50"/>
+              <minimumSize width="50" height="50"/>
+              <preferredSize width="50" height="50"/>
+            </properties>
+            <border type="none"/>
+            <children/>
+          </grid>
+          <component id="41740" class="javax.swing.JLabel">
+            <constraints/>
+            <properties>
+              <font size="48"/>
+              <text value=") à toi de jouer !"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>

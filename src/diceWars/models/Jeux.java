@@ -1,9 +1,9 @@
-package diceWars;
+package diceWars.models;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Jeux {
+public class Jeux extends AbstractModel {
 
     //region Constants
 
@@ -17,7 +17,11 @@ public class Jeux {
     private final ArrayList<Joueur> joueurs;
     private final Carte carte;
     private final Random random;
+    private Joueur nextJoueur;
     private boolean isGameOver;
+    private Coordinates attackingTerritory;
+    private Coordinates attackedTerritory;
+    private Joueur lastWinner;
 
     //endregion
 
@@ -35,6 +39,8 @@ public class Jeux {
         for (Joueur joueur : joueurs) {
             joueur.setJeux(this);
         }
+
+        this.nextJoueur = this.joueurs.get(0);
     }
 
     //endregion
@@ -74,9 +80,10 @@ public class Jeux {
     public void distributeSupportDices(Joueur joueur, int supportDices) {
 
         ArrayList<Coordinates> territoiresOfPlayer = this.carte.getTerritoiresOfPlayer(joueur);
+        Coordinates choosenTerritoire;
 
         while (supportDices > 0) {
-            Coordinates choosenTerritoire = territoiresOfPlayer.get(random.nextInt(territoiresOfPlayer.size()));
+            choosenTerritoire = territoiresOfPlayer.get(random.nextInt(territoiresOfPlayer.size()));
 
             if (this.carte.getNbDiceOnTerritoire(choosenTerritoire) + 1 <= NB_MAX_DICE_PER_TERRITOIRES) {
                 carte.setNbDiceOnTerritoire(choosenTerritoire, carte.getNbDiceOnTerritoire(choosenTerritoire) + 1);
@@ -257,6 +264,17 @@ public class Jeux {
     //region Game logic
 
     /**
+     * Procedure to end the round
+     */
+    public void endRound() {
+        System.out.println("Start");
+        int supportDices = this.carte.getMaxContiguousTerritories(this.nextJoueur);
+        this.distributeSupportDices(this.nextJoueur, supportDices);
+        this.nextJoueur = this.joueurs.get((this.joueurs.indexOf(this.nextJoueur) + 1) % this.joueurs.size());
+        System.out.println("End");
+    }
+
+    /**
      * Throw dice for attacking and attacked territory and depending on the result, apply the rules of the games
      *
      * @param coordinatesTerritoireAttaquant Coordinates attacking territory
@@ -265,11 +283,12 @@ public class Jeux {
      * @param nbDiceOnTerritoireAttaque      Number of dices on the attacked territory
      * @param joueur                         The current player
      */
-    protected void determineWinner(Coordinates coordinatesTerritoireAttaquant,
-                                   Coordinates coordinatesTerritoireAttaque,
-                                   int nbDiceOnTerritoireAttaquant,
-                                   int nbDiceOnTerritoireAttaque,
-                                   Joueur joueur) {
+    protected int[] determineWinner(Coordinates coordinatesTerritoireAttaquant,
+                                    Coordinates coordinatesTerritoireAttaque,
+                                    int nbDiceOnTerritoireAttaquant,
+                                    int nbDiceOnTerritoireAttaque,
+                                    Joueur joueur) {
+
         int scoreTerritoireAttaquant = this.throwDices(nbDiceOnTerritoireAttaquant);
         int scoreTerritoireAttaque = this.throwDices(nbDiceOnTerritoireAttaque);
 
@@ -278,32 +297,76 @@ public class Jeux {
         if (scoreTerritoireAttaquant > scoreTerritoireAttaque) {
             carte.setNbDiceOnTerritoire(coordinatesTerritoireAttaque, nbDiceOnTerritoireAttaque + nbDiceOnTerritoireAttaquant - 1);
             carte.setOwnerTerritoire(coordinatesTerritoireAttaque, joueur);
-            System.out.println("L'attaquant à gagné !");
+            joueur.incremetNbTerritoiresOwned();
+            this.lastWinner = joueur;
         } else {
-            System.out.println("Le défenseur à gagné !");
+            joueur.decremetNbTerritoiresOwned();
+            this.lastWinner = carte.getOwnerTerritoire(coordinatesTerritoireAttaque);
         }
 
         this.checkIsGameOver(joueur);
+
+        return new int[]{scoreTerritoireAttaquant, scoreTerritoireAttaque};
     }
 
-
-    protected boolean isGameNotOver() {
+    public boolean isGameNotOver() {
         return !this.isGameOver;
     }
 
     protected void checkIsGameOver(Joueur joueur) {
         this.isGameOver = carte.getNbTerritoiresPlayable() == carte.getTerritoiresOfPlayer(joueur).size();
-        if (this.isGameOver)
-            System.out.println("Joueur " + joueur.getId() + " a gagner la partie !");
+    }
+
+    public void reset() {
+        for (Joueur joueur : joueurs) {
+            joueur.reset();
+        }
+
+        this.allocateTerritoires();
+
+        this.isGameOver = false;
+        this.attackingTerritory = null;
+        this.attackedTerritory = null;
+        this.lastWinner = null;
+        this.nextJoueur = this.joueurs.get(0);
     }
 
     //endregion
 
     //region Getter
 
+    public Joueur getNextJoueur() {
+        return this.nextJoueur;
+    }
+
+    public Joueur getLastWinner() {
+        return lastWinner;
+    }
+
     public Carte getCarte() {
         return this.carte;
     }
+
+    public Coordinates getAttackingTerritory() {
+        return attackingTerritory;
+    }
+
+    public Coordinates getAttackedTerritory() {
+        return attackedTerritory;
+    }
+
+    //endregion
+
+    //region Setter
+
+    public void setAttackingTerritory(Coordinates attackingTerritory) {
+        this.attackingTerritory = attackingTerritory;
+    }
+
+    public void setAttackedTerritory(Coordinates attackedTerritory) {
+        this.attackedTerritory = attackedTerritory;
+    }
+
 
     //endregion
 

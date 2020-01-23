@@ -1,15 +1,14 @@
-package diceWars;
+package diceWars.models;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.util.*;
 
-public class Carte {
+public class Carte extends AbstractModel {
 
     //region Variables
 
@@ -70,7 +69,6 @@ public class Carte {
         }
     }
 
-
     /**
      * Extract data from the read line and make the corresponding territory playable (territoires[x][y] = True)
      *
@@ -92,12 +90,17 @@ public class Carte {
      * @param coordinates Coordinates to check
      * @return A boolean, true if coordinates ok, false else
      */
-    protected boolean isCoordinatesValid(Coordinates coordinates) {
+    public boolean isCoordinatesValid(Coordinates coordinates) {
         return coordinates.getX() >= 0 &&
                 coordinates.getX() < this.widht &&
                 coordinates.getY() >= 0 &&
                 coordinates.getY() < this.height &&
                 this.getTerritoires()[coordinates.getX()][coordinates.getY()];
+    }
+
+    public void reset() {
+        this.nbDiceByTerritoire.clear();
+        this.ownerTerritoire.clear();
     }
 
     //endregion
@@ -136,8 +139,8 @@ public class Carte {
      * @param coordinatesTerritoire Coordinates of the origin territory
      * @return ArrayList containing all coordinates of neighbors territories
      */
-    protected ArrayList<Coordinates> getNeighbors(Coordinates coordinatesTerritoire) {
-        ArrayList<Coordinates> neighbours = new ArrayList<>();
+    protected HashSet<Coordinates> getNeighbors(Coordinates coordinatesTerritoire) {
+        HashSet<Coordinates> neighbours = new HashSet<>();
 
         int row = coordinatesTerritoire.getY();
         int column = coordinatesTerritoire.getX();
@@ -186,10 +189,12 @@ public class Carte {
     protected int getMaxContiguousTerritories(Joueur joueur) {
 
         int maxContiguousTerritories = 0;
+        HashSet<Coordinates> territoiresVisited = new HashSet<>();
 
         for (Coordinates territoire : this.getTerritoiresOfPlayer(joueur)) {
             maxContiguousTerritories = Math.max(maxContiguousTerritories,
-                    this.computeContiguousTerritories(territoire, new ArrayList<>()));
+                    this.computeContiguousTerritories(territoire, territoiresVisited));
+            territoiresVisited.clear();
         }
 
         return maxContiguousTerritories;
@@ -202,11 +207,11 @@ public class Carte {
      * @param territoiresVisited    The list of territories already visited
      * @return The number of contiguous territories around the starting territory
      */
-    private int computeContiguousTerritories(Coordinates coordinatesTerritoire, ArrayList<Coordinates> territoiresVisited) {
+    private int computeContiguousTerritories(Coordinates coordinatesTerritoire, HashSet<Coordinates> territoiresVisited) {
 
         int maxContiguousTerritories = 0;
 
-        ArrayList<Coordinates> neighbors = this.getNeighbors(coordinatesTerritoire);
+        HashSet<Coordinates> neighbors = this.getNeighbors(coordinatesTerritoire);
 
         for (Coordinates neighbor : neighbors) {
 
@@ -214,8 +219,9 @@ public class Carte {
                     !territoiresVisited.contains(neighbor)) {
                 territoiresVisited.add(neighbor);
                 maxContiguousTerritories += this.computeContiguousTerritories(neighbor, territoiresVisited) + 1;
-            } else
+            } else {
                 maxContiguousTerritories += 0;
+            }
         }
 
         return maxContiguousTerritories;
@@ -227,7 +233,7 @@ public class Carte {
      * @param coordinatesTerritoire Coordinates of the territory
      * @return The number of dice present
      */
-    protected int getNbDiceOnTerritoire(Coordinates coordinatesTerritoire) {
+    public int getNbDiceOnTerritoire(Coordinates coordinatesTerritoire) {
         return this.nbDiceByTerritoire.get(coordinatesTerritoire);
     }
 
@@ -237,7 +243,7 @@ public class Carte {
      * @param coordinatesTerritoire Coordinates of the territory
      * @return The owner (type Joueur)
      */
-    protected Joueur getOwnerTerritoire(Coordinates coordinatesTerritoire) {
+    public Joueur getOwnerTerritoire(Coordinates coordinatesTerritoire) {
         return this.ownerTerritoire.get(coordinatesTerritoire);
     }
 
