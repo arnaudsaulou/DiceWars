@@ -145,10 +145,10 @@ public class Jeux extends AbstractModel {
             while (joueur.getNbTerritoiresOwned() < nbTerritoiresPerJoueur) {
 
                 //Browse in height
-                for (int y = 0; y < carte.getHeight() && joueur.getNbTerritoiresOwned() < nbTerritoiresPerJoueur; y++) {
+                for (int y = 0; y < carte.getSize() && joueur.getNbTerritoiresOwned() < nbTerritoiresPerJoueur; y++) {
 
                     //Browse in width
-                    for (int x = 0; x < carte.getWidht() && joueur.getNbTerritoiresOwned() < nbTerritoiresPerJoueur; x++) {
+                    for (int x = 0; x < carte.getSize() && joueur.getNbTerritoiresOwned() < nbTerritoiresPerJoueur; x++) {
                         associateTerritoireWithJoueurOrNot(joueur, diceByTerritoire, x, y);
                     }
                 }

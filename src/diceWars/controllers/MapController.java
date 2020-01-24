@@ -28,8 +28,8 @@ public class MapController extends AbstractController implements ActionListener 
 
     private void setUpMapView() {
         Color color = null;
-        for (int y = -1; y < this.carte.getHeight(); y++) {
-            for (int x = -1; x < this.carte.getWidht(); x++) {
+        for (int y = -1; y < this.carte.getSize(); y++) {
+            for (int x = -1; x < this.carte.getSize(); x++) {
 
                 if (y == -1) {
                     if (x != -1) {
@@ -75,11 +75,11 @@ public class MapController extends AbstractController implements ActionListener 
     }
 
     public void updateMap() {
-        Component component = null;
-        TerritoryView territoryView = null;
-        Coordinates coordinates = null;
+        Component component;
+        TerritoryView territoryView;
+        Coordinates coordinates;
 
-        for (int componentIndex = 0; componentIndex < this.carte.getHeight() * this.carte.getWidht(); componentIndex++) {
+        for (int componentIndex = 0; componentIndex < this.carte.getSize() * this.carte.getSize(); componentIndex++) {
             component = this.mapView.getDisplayableViewPanel().getComponent(componentIndex);
             if (component instanceof TerritoryView) {
                 territoryView = (TerritoryView) component;

@@ -6,7 +6,7 @@ import diceWars.models.exceptions.NotBelongingTerritoryException;
 import diceWars.models.exceptions.OneDiceTerritoryException;
 
 import java.awt.*;
-import java.util.*;
+import java.util.Random;
 
 public class Joueur {
 
@@ -39,8 +39,8 @@ public class Joueur {
 
     private Color chooseColor() {
         Random rand = new Random();
-        Color color = null;
-        boolean retry = false;
+        Color color;
+        boolean retry;
 
         do {
             color = Partie.COLOR[rand.nextInt(Partie.COLOR.length)];
@@ -77,7 +77,7 @@ public class Joueur {
 
         if (this.jeux.getCarte().getOwnerTerritoire(coordinatesTerritoireAttaquant) == this) {
             if (nbDiceOnTerritoireAttaquant != 1) {
-                if (this.jeux.getCarte().getNeighbors(coordinatesTerritoireAttaquant).contains(coordinatesTerritoireAttaque)) {
+                if (this.jeux.getCarte().getNeighborsPlayable(coordinatesTerritoireAttaquant).contains(coordinatesTerritoireAttaque)) {
                     if (this.jeux.getCarte().getOwnerTerritoire(coordinatesTerritoireAttaque) != this) {
                         scores = this.jeux.determineWinner(
                                 coordinatesTerritoireAttaquant,

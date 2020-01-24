@@ -26,7 +26,7 @@ public class MapView extends AbstractView {
         JPanelWithBackground JPanel = new JPanelWithBackground(this.imgBackground);
         JPanel.setBorder(BorderFactory.createEtchedBorder());
 
-        GridLayout grid = new GridLayout(carte.getHeight() + 1, carte.getWidht() + 1, 2, 2);
+        GridLayout grid = new GridLayout(carte.getSize() + 1, carte.getSize() + 1, 2, 2);
         JPanel.setLayout(grid);
 
         this.setViewPanel(JPanel);

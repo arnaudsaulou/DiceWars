@@ -25,21 +25,8 @@ public class Partie extends AbstractModel {
     //endregion
 
     public Partie(int nbPlayer) throws IllegalStateException {
-
-        Carte carte = new Carte(25, 25);
-
+        Carte carte = new Carte(25, (float) 0.5, nbPlayer);
         this.joueurs = initializeJoueurs(nbPlayer);
-
-        //TODO
-        //carte.importCarteFromCSV(askUserCarteToImportPath());
-        carte.importCarteFromCSV("C:\\Users\\Arnaud\\Documents\\Cours\\L3\\Java2\\DiceWars\\res\\Carte1.csv");
-
-        if (carte.getNbTerritoiresPlayable() < joueurs.size()) {
-            throw new IllegalStateException("Plus de joueur que de territoires");
-        } else if (carte.getNbTerritoiresPlayable() % joueurs.size() != 0) {
-            throw new IllegalStateException("Le nombre de territoires n'est pas un multiple du nombre de joueurs");
-        }
-
         this.jeux = new Jeux(carte, joueurs);
     }
 
