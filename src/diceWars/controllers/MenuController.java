@@ -11,23 +11,33 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+/**
+ * Controller of the view Menu
+ */
 public class MenuController extends AbstractController implements MouseListener {
 
+    //region Variables
+
     private final MenuView menuView;
+
+    //endregion
+
+    //region Constructor
 
     public MenuController(AbstractModel abstractModel, AbstractView menuView) {
         super(abstractModel, menuView);
 
         this.menuView = (MenuView) menuView;
-        this.registerListener();
-    }
 
-    private void registerListener() {
+        //Register listener on menu's buttons
         this.menuView.getJLabelJouerSolo().addMouseListener(this);
         this.menuView.getJLabelJouerMulti().addMouseListener(this);
         this.menuView.getJLabelQuitter().addMouseListener(this);
     }
 
+    //endregion
+
+    //region Override
 
     @Override
     public void mouseClicked(MouseEvent e) {
@@ -88,4 +98,6 @@ public class MenuController extends AbstractController implements MouseListener 
             this.menuView.getJLabelQuitter().setFont(new Font("Arial Black", Font.BOLD, 30));
         }
     }
+
+    //endregion
 }

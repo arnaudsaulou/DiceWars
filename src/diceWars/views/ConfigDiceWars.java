@@ -6,6 +6,8 @@ import diceWars.models.Partie;
 import javax.swing.*;
 import java.awt.*;
 
+import static diceWars.models.Partie.COLOR;
+
 public class ConfigDiceWars extends JDialog {
 
     private int nbJoueur;
@@ -66,7 +68,7 @@ public class ConfigDiceWars extends JDialog {
         jButtonValidate.requestFocus();
         jButtonValidate.addActionListener(e -> {
             nbJoueur = Integer.parseInt(jTextFieldNbJoueur.getText());
-            if (nbJoueur > 1) {
+            if (nbJoueur > 1 && nbJoueur <= COLOR.length) {
                 try {
                     DiceWars.applicationController.lunchPartie(Partie.MODE.MULTI, nbJoueur);
                     ConfigDiceWars.this.dispose();
@@ -75,7 +77,7 @@ public class ConfigDiceWars extends JDialog {
                 }
 
             } else {
-                jLabelError.setText("Veuillez saisir un nombre de joueur supérieur à 2");
+                jLabelError.setText("Veuillez saisir un nombre de joueur supérieur à 1 et inférieur à " + (COLOR.length + 1));
             }
         });
 

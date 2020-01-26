@@ -24,7 +24,7 @@ public class Partie extends AbstractModel {
 
     //endregion
 
-    public Partie(int nbPlayer, MODE mode) throws IllegalStateException {
+    public Partie(int nbPlayer, MODE mode) {
         this.mode = mode;
 
         this.joueurs = initializeJoueurs(nbPlayer);
@@ -39,16 +39,12 @@ public class Partie extends AbstractModel {
 
     //region Utils
 
-    private ArrayList<Joueur> initializeJoueurs(int nbPlayer) throws IllegalStateException {
+    private ArrayList<Joueur> initializeJoueurs(int nbPlayer) {
 
         ArrayList<Joueur> listJoueur = new ArrayList<>();
 
-        if (nbPlayer <= COLOR.length) {
-            for (int i = 0; i < nbPlayer; i++) {
-                listJoueur.add(new Joueur());
-            }
-        } else {
-            throw new IllegalStateException("Trop de joueur (max : " + COLOR.length + ")");
+        for (int i = 0; i < nbPlayer; i++) {
+            listJoueur.add(new Joueur());
         }
 
         return listJoueur;

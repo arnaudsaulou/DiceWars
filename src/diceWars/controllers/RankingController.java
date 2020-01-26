@@ -9,13 +9,20 @@ import diceWars.views.RankingView;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
+/**
+ * Controller of the model Ranking and RankingView view
+ */
 public class RankingController extends AbstractController {
+
+    //region Variables
 
     private final Ranking ranking;
     private final RankingView rankingView;
+
+    //endregion
+
+    //region Constructor
 
     public RankingController(AbstractModel ranking, AbstractView rankingView) {
         super(ranking, rankingView);
@@ -23,15 +30,19 @@ public class RankingController extends AbstractController {
         this.ranking = (Ranking) ranking;
         this.rankingView = (RankingView) rankingView;
 
-        this.rankingView.getQuit().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                DiceWars.applicationController.quit();
-            }
-        });
-
+        //Register listener on the quit button
+        this.rankingView.getQuit().addActionListener(actionEvent -> DiceWars.applicationController.quit());
     }
 
+    //endregion
+
+    //region Utils
+
+    /**
+     * Construct 2D array representing the ranking ready to inject in a JTable
+     *
+     * @return The 2D array representing the ranking
+     */
     private String[][] constructRankinObject() {
         String[][] ranking = new String[this.ranking.getJoueurList().size()][2];
 
@@ -41,25 +52,31 @@ public class RankingController extends AbstractController {
         }
 
         return ranking;
-
     }
 
+    /**
+     * Construct rankingView with a JScrollPane panel and a JTable
+     */
     public void updateRanking() {
 
         JScrollPane scrollPane = new JScrollPane();
 
         String[] columnNames = {"Joueur", "Nombre de territoires"};
 
+        //Fill table with the 2D array of constructRankinObject
         JTable jTable = new JTable(this.constructRankinObject(), columnNames);
         jTable.setDefaultEditor(Object.class, null);
         jTable.setRowHeight(50);
         jTable.setFont(new Font("ARIAL", Font.PLAIN, 20));
-
         scrollPane.setViewportView(jTable);
 
+        //Insert the table
         this.rankingView.getCenterPanel().add(scrollPane, BorderLayout.CENTER);
 
+        //Update name of the winner
         Jeux jeux = (Jeux) DiceWars.applicationController.getGameController().getModel();
         this.rankingView.getWinnerName().setText("Joueur " + (jeux.getLastWinner().getId() + 1));
     }
+
+    //endregion
 }
