@@ -4,7 +4,7 @@ import diceWars.interfaces.Displayable;
 
 import javax.swing.*;
 
-public class AbstractView implements Displayable {
+public abstract class AbstractView implements Displayable {
 
     private JPanel viewPanel;
 

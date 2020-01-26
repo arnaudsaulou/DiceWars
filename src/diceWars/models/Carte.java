@@ -27,9 +27,9 @@ public class Carte extends AbstractModel {
         this.ownerTerritoire = new HashMap<>();
         this.random = new Random();
 
+        //Create a random map and verify it
         this.createMap(new Coordinates(this.random.nextInt(this.size), this.random.nextInt(this.size)));
         this.verifyMap(nbPlayer);
-
     }
 
     //endregion
@@ -37,83 +37,48 @@ public class Carte extends AbstractModel {
     //region Utils
 
     private void verifyMap(int nbPlayer) {
+        //Check if there is more territories on the map than players and
+        //if the number of territories is a multiple of the number of players
         if (this.getNbTerritoiresPlayable() < nbPlayer || this.getNbTerritoiresPlayable() % nbPlayer != 0) {
             try {
+                //Reset the map
                 for (boolean[] territoire : this.territoires) {
                     Arrays.fill(territoire, false);
                 }
+
+                //Create a random map and verify it
                 this.createMap(new Coordinates(this.random.nextInt(this.size), this.random.nextInt(this.size)));
                 this.verifyMap(nbPlayer);
             } catch (StackOverflowError e) {
+
+                //Force garbage collector (recursive)
                 System.gc();
             }
         }
     }
 
-    /*private void createMap() {
-
-        int remove = 0;
-
-        ArrayList<Coordinates> playableTerritories = new ArrayList<>();
-        ArrayList<Coordinates> visitedTerritories = new ArrayList<>();
-
-        for (int y = 0; y < this.territoires.length; y++) {
-            for (int x = 0; x < this.territoires[y].length; x++) {
-                this.territoires[y][x] = true;
-                playableTerritories.add(new Coordinates(x, y));
-            }
-        }
-
-        int totalNbTerritories = this.size * this.size;
-        int nbTerritoriesToRemove = (int) (totalNbTerritories - (totalNbTerritories * this.density));
-
-        System.out.println("totalNbTerritories : " + totalNbTerritories);
-        System.out.println("nbTerritoriesToRemove : " + nbTerritoriesToRemove);
-
-        while (nbTerritoriesToRemove > 0) {
-
-            Coordinates designatedTerritory = playableTerritories.get(this.random.nextInt(playableTerritories.size()));
-            visitedTerritories.add(designatedTerritory);
-            HashSet<Coordinates> neighborsPlayable = this.getNeighborsPlayable(designatedTerritory);
-
-            System.out.println(nbTerritoriesToRemove);
-
-
-            for (Coordinates neighbor : neighborsPlayable) {
-                HashSet<Coordinates> neighborsPlayableOfNeighborsPlayable = this.getNeighborsPlayable(neighbor);
-                neighborsPlayableOfNeighborsPlayable.removeAll(visitedTerritories);
-
-                if (neighborsPlayableOfNeighborsPlayable.size() > 2) {
-                    remove++;
-                    //System.out.println(remove);
-                    this.territoires[designatedTerritory.getY()][designatedTerritory.getX()] = false;
-                    playableTerritories.remove(designatedTerritory);
-                    nbTerritoriesToRemove--;
-                    break;
-                }
-
-            }
-        }
-
-        System.out.println(this);
-    }*/
-
-
+    /**
+     * Create recursively a random map depending on the density
+     *
+     * @param startingPoint The starting point where to start the procedure
+     */
     private void createMap(Coordinates startingPoint) {
 
-        ArrayList<Coordinates> surroundingTerritories = this.getSurroundingTerritories(startingPoint);
-        surroundingTerritories.removeAll(this.getNeighborsPlayable(startingPoint));
+        //Get non playable neighbors
+        ArrayList<Coordinates> nonPlayableNeighbors = new ArrayList<>(this.getNeighbors(startingPoint, false));
 
-        if (!surroundingTerritories.isEmpty()) {
+        //If exist non playable around the startingPoint
+        if (!nonPlayableNeighbors.isEmpty()) {
+
+            //Enable the startingPoint
             this.territoires[startingPoint.getY()][startingPoint.getX()] = true;
 
-            int index = (this.random.nextInt(surroundingTerritories.size()));
-            Coordinates nextTerritory = surroundingTerritories.get(index);
+            //Foreach non playable neighbors
+            for (Coordinates designatedTerritory : nonPlayableNeighbors) {
 
-            for (Coordinates designatedTerritory : surroundingTerritories) {
-
-                if (this.getNeighborsPlayable(designatedTerritory).size() < Math.min((this.density * 10), 9)) {
-                    this.createMap(nextTerritory);
+                //If number of playable neighbors < density * 10
+                if (this.getNeighbors(designatedTerritory, true).size() < Math.min((this.density * 10), 9)) {
+                    this.createMap(designatedTerritory);
                 }
             }
         }
@@ -163,35 +128,15 @@ public class Carte extends AbstractModel {
 
     //region Getter
 
-    protected ArrayList<Coordinates> getSurroundingTerritories(Coordinates coordinatesTerritoire) {
-        ArrayList<Coordinates> surrounding = new ArrayList<>();
-
-        int row = coordinatesTerritoire.getY();
-        int column = coordinatesTerritoire.getX();
-
-        //Search upper, at the same level and lower
-        for (int y = Math.max(0, row - 1); y <= Math.min(this.size - 1, row + 1); y++) {
-
-            //Search left, in the middle and right
-            for (int x = Math.max(0, column - 1); x <= Math.min(this.size - 1, column + 1); x++) {
-
-                //If it's not the origin territory
-                if (x != column || y != row) {
-                    surrounding.add(new Coordinates(x, y));
-                }
-            }
-        }
-
-        return surrounding;
-    }
 
     /**
-     * Get coordinates of playable neighbors territories
+     * Get coordinates of neighbors territories, playable or not
      *
      * @param coordinatesTerritoire Coordinates of the origin territory
-     * @return ArrayList containing all coordinates of playable neighbors territories
+     * @param condition             True if wants playable neighbors, false if want non playable neighbors
+     * @return ArrayList containing all coordinates of playable (or not) neighbors territories
      */
-    protected HashSet<Coordinates> getNeighborsPlayable(Coordinates coordinatesTerritoire) {
+    protected HashSet<Coordinates> getNeighbors(Coordinates coordinatesTerritoire, boolean condition) {
         HashSet<Coordinates> neighbours = new HashSet<>();
 
         int row = coordinatesTerritoire.getY();
@@ -203,8 +148,8 @@ public class Carte extends AbstractModel {
             //Search left, in the middle and right
             for (int x = Math.max(0, column - 1); x <= Math.min(this.size - 1, column + 1); x++) {
 
-                //If it's not the origin territory and the terittoires is playable
-                if ((x != column || y != row) && this.territoires[y][x]) {
+                //If it's not the origin territory and the terittoires is playable or not
+                if ((x != column || y != row) && (this.territoires[y][x] == condition)) {
                     neighbours.add(new Coordinates(x, y));
                 }
             }
@@ -264,7 +209,7 @@ public class Carte extends AbstractModel {
 
         int maxContiguousTerritories = 0;
 
-        HashSet<Coordinates> neighbors = this.getNeighborsPlayable(coordinatesTerritoire);
+        HashSet<Coordinates> neighbors = this.getNeighbors(coordinatesTerritoire, true);
 
         for (Coordinates neighbor : neighbors) {
 

@@ -1,4 +1,7 @@
 package diceWars.models;
 
-public class AbstractModel {
+/**
+ * Mother class of all models
+ */
+public abstract class AbstractModel {
 }

@@ -306,15 +306,31 @@ public class Jeux extends AbstractModel {
         return new int[]{scoreTerritoireAttaquant, scoreTerritoireAttaque};
     }
 
+    /**
+     * Update the number of territories owned after a victory
+     *
+     * @param winner The player winner of the round
+     * @param looser The player looser of the round
+     */
     private void updateNbTerritoryOwned(Joueur winner, Joueur looser) {
         winner.incremetNbTerritoiresOwned();
         looser.decremetNbTerritoiresOwned();
     }
 
+    /**
+     * Return true if a player owned all territories, false else
+     *
+     * @return is the game over or not
+     */
     public boolean isGameNotOver() {
         return !this.isGameOver;
     }
 
+    /**
+     * Check if a player pass in parameters owned all territories
+     *
+     * @param joueur The player to check
+     */
     protected void checkIsGameOver(Joueur joueur) {
         this.isGameOver = carte.getNbTerritoiresPlayable() == carte.getTerritoiresOfPlayer(joueur).size();
     }
@@ -354,7 +370,6 @@ public class Jeux extends AbstractModel {
     public void setAttackedTerritory(Coordinates attackedTerritory) {
         this.attackedTerritory = attackedTerritory;
     }
-
 
     //endregion
 

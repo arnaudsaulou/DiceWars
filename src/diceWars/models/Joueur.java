@@ -36,6 +36,11 @@ public class Joueur {
         this.colorPlayer = this.chooseColor();
     }
 
+    /**
+     * Associate a color from the list of colors available to the player
+     *
+     * @return The choosen color
+     */
     private Color chooseColor() {
         Random rand = new Random();
         Color color;
@@ -77,7 +82,7 @@ public class Joueur {
         if (this.jeux.getCarte().getOwnerTerritoire(coordinatesTerritoireAttaquant) == this) {
             if (nbDiceOnTerritoireAttaquant != 1) {
                 if (this.jeux.getCarte().getOwnerTerritoire(coordinatesTerritoireAttaque) != this) {
-                    if (this.jeux.getCarte().getNeighborsPlayable(coordinatesTerritoireAttaquant).contains(coordinatesTerritoireAttaque)) {
+                    if (this.jeux.getCarte().getNeighbors(coordinatesTerritoireAttaquant, true).contains(coordinatesTerritoireAttaque)) {
 
                         scores = this.jeux.determineWinner(
                                 coordinatesTerritoireAttaquant,
@@ -98,7 +103,6 @@ public class Joueur {
         return scores;
     }
 
-
     /**
      * Add one to the number of territories owned
      */
@@ -111,10 +115,6 @@ public class Joueur {
      */
     public void decremetNbTerritoiresOwned() {
         this.nbTerritoiresOwned--;
-    }
-
-    public void reset() {
-        this.nbTerritoiresOwned = 0;
     }
 
     //endregion

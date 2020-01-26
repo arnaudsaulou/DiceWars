@@ -18,27 +18,36 @@ public class Partie extends AbstractModel {
 
     //region Variables
 
-    private final MODE mode;
     private final Jeux jeux;
     private final ArrayList<Joueur> joueurs;
 
     //endregion
 
+    //region Constructor
+
     public Partie(int nbPlayer, MODE mode) {
-        this.mode = mode;
 
         this.joueurs = initializeJoueurs(nbPlayer);
 
-        if (this.mode.equals(MODE.SOLO)) {
+        if (mode.equals(MODE.SOLO)) {
             nbPlayer += 1;
+            //Add the ia to the list of joueurs
             this.joueurs.add(new IA());
         }
 
         this.jeux = new Jeux(new Carte(nbPlayer), joueurs);
     }
 
+    //endregion
+
     //region Utils
 
+    /**
+     * Create the number of joueurs pass in parameters and put them into a list
+     *
+     * @param nbPlayer The number of players to create
+     * @return The list of players created
+     */
     private ArrayList<Joueur> initializeJoueurs(int nbPlayer) {
 
         ArrayList<Joueur> listJoueur = new ArrayList<>();
@@ -53,6 +62,8 @@ public class Partie extends AbstractModel {
 
     //endregion
 
+    //region Getter
+
     public Jeux getJeux() {
         return this.jeux;
     }
@@ -60,5 +71,7 @@ public class Partie extends AbstractModel {
     public ArrayList<Joueur> getJoueurs() {
         return this.joueurs;
     }
+
+    //endregion
 
 }
