@@ -6,6 +6,12 @@ import java.util.*;
 
 public class Carte extends AbstractModel {
 
+    //region Constants
+
+    private static final int MULTIPLIER_DENSITY = 10;
+
+    //endregion
+
     //region Variables
 
     private final int size;
@@ -77,7 +83,9 @@ public class Carte extends AbstractModel {
             for (Coordinates designatedTerritory : nonPlayableNeighbors) {
 
                 //If number of playable neighbors < density * 10
-                if (this.getNeighbors(designatedTerritory, true).size() < Math.min((this.density * 10), 9)) {
+                if (this.getNeighbors(
+                        designatedTerritory, true).size() < Math.min((this.density * MULTIPLIER_DENSITY), 9)
+                ) {
                     this.createMap(designatedTerritory);
                 }
             }

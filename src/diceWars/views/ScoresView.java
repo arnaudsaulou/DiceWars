@@ -2,14 +2,20 @@ package diceWars.views;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class ScoresView extends JDialog {
+
+    //region Constantes
 
     private static final int DISPLAY_TIME = 500;
     private static final String ATTACKER_STRING = "Attaquant :";
     private static final String DEFENDER_STRING = "Defenseur :";
+    private static final int WIDTH = 500;
+    private static final int HEIGHT = 25;
+
+    //endregion
+
+    //region Constructor
 
     public ScoresView(int[] scores) {
 
@@ -17,12 +23,8 @@ public class ScoresView extends JDialog {
         this.setResizable(false);
         this.setUndecorated(true);
 
-        new Timer(DISPLAY_TIME, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                dispose();
-            }
-        }).start();
+        //Start timer to dispose the dialog after DISPLAY_TIME
+        new Timer(DISPLAY_TIME, actionEvent -> dispose()).start();
 
         JPanel borderPanel = new JPanel(new BorderLayout());
         borderPanel.setBorder(BorderFactory.createBevelBorder(0));
@@ -30,8 +32,7 @@ public class ScoresView extends JDialog {
         JPanel xPanel = new JPanel();
         xPanel.setLayout(new BoxLayout(xPanel, BoxLayout.LINE_AXIS));
 
-        // Create the components:
-
+        // Create components
         Font font = new Font("ARIAL", Font.BOLD, 30);
 
         JLabel attackerLabel = new JLabel(ATTACKER_STRING);
@@ -55,10 +56,10 @@ public class ScoresView extends JDialog {
         defenderScore.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 20));
 
         JPanel topPanel = new JPanel();
-        topPanel.setPreferredSize(new Dimension(500, 25));
+        topPanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 
         JPanel bottomPanel = new JPanel();
-        bottomPanel.setPreferredSize(new Dimension(500, 25));
+        bottomPanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 
         // Add all of our components to the panel:
         xPanel.add(attackerLabel);
@@ -66,7 +67,6 @@ public class ScoresView extends JDialog {
         xPanel.add(divider);
         xPanel.add(defenderLabel);
         xPanel.add(defenderScore);
-        //xPanel.setVisible(true);
 
         // Finally add our panel that contains all our components:
         borderPanel.add(topPanel, BorderLayout.NORTH);
@@ -80,5 +80,7 @@ public class ScoresView extends JDialog {
         this.setLocationRelativeTo(null);
         this.setVisible(true);
     }
+
+    //endregion
 
 }

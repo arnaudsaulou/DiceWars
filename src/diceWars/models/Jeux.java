@@ -8,6 +8,7 @@ public class Jeux extends AbstractModel {
     //region Constants
 
     private static final int NB_MAX_DICE_PER_TERRITOIRES = 8;
+    private static final int NB_DICE_FACES_MINUS_ONE = 5;
 
     //endregion
 
@@ -68,7 +69,9 @@ public class Jeux extends AbstractModel {
      * @return A random value between 1 and 6
      */
     private int aleatoire() {
-        return this.random.nextInt(5) + 1;
+
+        //Add one to have [1,6] instead of [0,5]
+        return this.random.nextInt(NB_DICE_FACES_MINUS_ONE) + 1;
     }
 
     /**

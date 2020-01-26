@@ -10,13 +10,29 @@ import static diceWars.models.Partie.COLOR;
 
 public class ConfigDiceWars extends JDialog {
 
+    //region Constants
+
+    private static final int WIDTH = 600;
+    private static final int HEIGHT = 300;
+    private static final int VERTICAL_OFFSET = 25;
+    private static final int WIDTH_LABEL = 400;
+    private static final int HEIGHT_LABEL = 50;
+
+    //endregion
+
+    //region Variables
+
     private int nbJoueur;
 
+    //endregion
+
+    //region Constructor
+
     public ConfigDiceWars() {
-        this.setSize(new Dimension(600, 300));
+        this.setSize(new Dimension(WIDTH, HEIGHT));
         this.setLocation(
-                (DiceWars.applicationController.getApplicationView().getWidth() / 2) - 300,
-                (DiceWars.applicationController.getApplicationView().getHeight() / 2) - 25);
+                (DiceWars.applicationController.getApplicationView().getWidth() / 2) - HEIGHT,
+                (DiceWars.applicationController.getApplicationView().getHeight() / 2) - VERTICAL_OFFSET);
         this.setTitle("Configuration Dicewars");
         this.setUndecorated(true);
         this.setModal(true);
@@ -27,6 +43,15 @@ public class ConfigDiceWars extends JDialog {
         this.setVisible(true);
     }
 
+    //endregion
+
+    //region Utils
+
+    /**
+     * Construct a JPanel to configure the number of player
+     *
+     * @return The JPanel ready to be displayed
+     */
     private JPanel constructConfigDiceWarsPanel() {
 
         JPanel constructedPanel = new JPanel();
@@ -36,7 +61,7 @@ public class ConfigDiceWars extends JDialog {
         JLabel jLabelTitre = new JLabel("Configuration");
         jLabelTitre.setFont(new Font("Arial Black", Font.BOLD, 20));
         jLabelTitre.setHorizontalAlignment(JLabel.CENTER);
-        jLabelTitre.setPreferredSize(new Dimension(400, 50));
+        jLabelTitre.setPreferredSize(new Dimension(WIDTH_LABEL, HEIGHT_LABEL));
 
         JPanel jPanelOption = new JPanel();
         GridBagConstraints gbc = new GridBagConstraints();
@@ -62,7 +87,6 @@ public class ConfigDiceWars extends JDialog {
 
         JButton jButtonCancel = new JButton("ANNULER");
         jButtonCancel.addActionListener(e -> ConfigDiceWars.this.dispose());
-
 
         JButton jButtonValidate = new JButton("VALIDER");
         jButtonValidate.requestFocus();
@@ -90,4 +114,7 @@ public class ConfigDiceWars extends JDialog {
 
         return constructedPanel;
     }
+
+    //endregion
+
 }

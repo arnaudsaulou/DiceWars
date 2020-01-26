@@ -5,6 +5,8 @@ import java.awt.*;
 
 public class GameView extends AbstractView {
 
+    //region Variables
+
     private JPanel gameViewPanel;
     private JPanel mapViewPanel;
     private JButton endRoundButton;
@@ -12,23 +14,44 @@ public class GameView extends AbstractView {
     private JPanel playersColor;
     private JLabel title_idPlayer;
 
+    //endregion
+
+    //region Constructor
+
     public GameView(MapView mapView) {
         this.setViewPanel(this.gameViewPanel);
-
         this.mapViewPanel.add(mapView.getDisplayableViewPanel(), BorderLayout.CENTER);
     }
 
+    //endregion
+
+    //region Utils
+
+    /**
+     * Disable all components of the gameViewPanel
+     */
     public void freezeView() {
         this.setEnableRec(this.gameViewPanel, false);
     }
 
+    /**
+     * Enable all components of the gameViewPanel
+     */
     public void unfreezeView() {
         this.setEnableRec(this.gameViewPanel, true);
     }
 
+    /**
+     * Enable or disable the container pass in parameters
+     *
+     * @param container The container to enable or not
+     * @param enable    The action, true : enable , false : disable
+     */
     private void setEnableRec(Component container, boolean enable) {
+
         container.setEnabled(enable);
 
+        //Try to get children components
         try {
             Component[] components = ((Container) container).getComponents();
             for (Component component : components) {
@@ -38,6 +61,10 @@ public class GameView extends AbstractView {
 
         }
     }
+
+    //endregion
+
+    //region Getter
 
     public JButton getEndRoundButton() {
         return this.endRoundButton;
@@ -54,4 +81,6 @@ public class GameView extends AbstractView {
     public JLabel getTitle_idPlayer() {
         return title_idPlayer;
     }
+
+    //endregion
 }

@@ -6,29 +6,29 @@ import diceWars.interfaces.Displayable;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
 
 public class SplashscreenView extends JPanel implements Displayable {
 
-    private Image imgBackground;  //variable de l'image de fond  afficher
+    //region Constants
+
+    private static final int SPLASHSCREEN_DELAY = 3000;
+
+    //endregion
+
+    //region Variables
+
+    private Image imgBackground;
+
+    //endregion
+
+    //region Constructor
 
     public SplashscreenView() {
 
-        Timer timer = new Timer(3000, new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                DiceWars.applicationController.changeView(DiceWars.applicationController.getMenuController().getView());
-            }
-        });
-
-        timer.setRepeats(false);
-        timer.start();
-
+        //Try to get the splashscreen image
         try {
             BufferedImage splashscreen = ImageIO.read(new FileInputStream("res/images/splashscreen.jpg"));
             ImageIcon icon = new ImageIcon(splashscreen);
@@ -37,9 +37,21 @@ public class SplashscreenView extends JPanel implements Displayable {
             e.printStackTrace();
         }
 
-        this.setVisible(true);
+        //Remove splashscreen after SPLASHSCREEN_DELAY
+        Timer timer = new Timer(SPLASHSCREEN_DELAY,
+                arg0 -> DiceWars.applicationController.changeView(
+                        DiceWars.applicationController.getMenuController().getView())
+        );
 
+        timer.setRepeats(false);
+        timer.start();
+
+        this.setVisible(true);
     }
+
+    //endregion
+
+    //region Override
 
     @Override
     public void paintComponent(Graphics g) {
@@ -50,4 +62,6 @@ public class SplashscreenView extends JPanel implements Displayable {
     public JPanel getDisplayableViewPanel() {
         return this;
     }
+
+    //endregion
 }

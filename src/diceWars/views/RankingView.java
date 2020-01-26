@@ -3,14 +3,23 @@ package diceWars.views;
 import javax.swing.*;
 
 public class RankingView extends AbstractView {
+
+    //region Variables
+
     private JPanel resultPanel;
     private JButton quit;
     private JPanel centerPanel;
     private JLabel winnerName;
 
+    //endregion
+
+    //region Constructor
+
     public RankingView() {
         this.setViewPanel(this.resultPanel);
     }
+
+    //endregion
 
     //region Getter
 

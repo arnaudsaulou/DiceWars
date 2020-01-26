@@ -9,13 +9,20 @@ import java.io.IOException;
 
 public class MenuView extends AbstractView {
 
+    //region Variables
+
     private final JLabel jLabelJouerSolo;
     private final JLabel jLabelJouerMulti;
     private final JLabel jLabelQuitter;
     private Image imgBackground;
 
+    //endregion
+
+    //region Constructor
+
     public MenuView() {
 
+        //Try to get the background image
         try {
             BufferedImage splashscreen = ImageIO.read(new FileInputStream("res/images/backgroundMenu.jpg"));
             ImageIcon icon = new ImageIcon(splashscreen);
@@ -25,7 +32,6 @@ public class MenuView extends AbstractView {
         }
 
         JPanelWithBackground menuViewPanel = new JPanelWithBackground(this.imgBackground);
-        //JPanel menuViewPanel = new JPanel();
 
         JPanel jPanel_titre = new JPanel();
         jPanel_titre.setPreferredSize(new Dimension(menuViewPanel.getWidth(), 500));
@@ -81,6 +87,8 @@ public class MenuView extends AbstractView {
 
         this.setViewPanel(menuViewPanel);
     }
+
+    //endregion
 
     //region Getter
 
