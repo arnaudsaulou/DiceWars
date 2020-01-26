@@ -20,18 +20,17 @@ public class Joueur {
 
     private final int id;
     private int nbTerritoiresOwned;
-    private Jeux jeux;
-    private Color colorPlayer;
+    private final Color colorPlayer;
+    protected Jeux jeux;
 
     //endregion
 
     //region Constructor
 
-    public Joueur(Jeux jeux) {
+    public Joueur() {
         //Set the id of the new player and increment the id for the next one
         this.id = ID_REGISTER;
         ID_REGISTER++;
-        this.jeux = jeux;
         this.nbTerritoiresOwned = 0;
 
         this.colorPlayer = this.chooseColor();
@@ -77,8 +76,9 @@ public class Joueur {
 
         if (this.jeux.getCarte().getOwnerTerritoire(coordinatesTerritoireAttaquant) == this) {
             if (nbDiceOnTerritoireAttaquant != 1) {
-                if (this.jeux.getCarte().getNeighborsPlayable(coordinatesTerritoireAttaquant).contains(coordinatesTerritoireAttaque)) {
-                    if (this.jeux.getCarte().getOwnerTerritoire(coordinatesTerritoireAttaque) != this) {
+                if (this.jeux.getCarte().getOwnerTerritoire(coordinatesTerritoireAttaque) != this) {
+                    if (this.jeux.getCarte().getNeighborsPlayable(coordinatesTerritoireAttaquant).contains(coordinatesTerritoireAttaque)) {
+
                         scores = this.jeux.determineWinner(
                                 coordinatesTerritoireAttaquant,
                                 coordinatesTerritoireAttaque,
@@ -87,9 +87,9 @@ public class Joueur {
                                 this
                         );
                     } else
-                        throw new BelongingTerritoryException(coordinatesTerritoireAttaquant, coordinatesTerritoireAttaque);
+                        throw new NonNeighboringTerritoryException(coordinatesTerritoireAttaquant, coordinatesTerritoireAttaque);
                 } else
-                    throw new NonNeighboringTerritoryException(coordinatesTerritoireAttaquant, coordinatesTerritoireAttaque);
+                    throw new BelongingTerritoryException(coordinatesTerritoireAttaquant, coordinatesTerritoireAttaque);
             } else
                 throw new OneDiceTerritoryException(coordinatesTerritoireAttaquant, coordinatesTerritoireAttaque);
         } else
@@ -113,7 +113,7 @@ public class Joueur {
         this.nbTerritoiresOwned--;
     }
 
-    public void reset(){
+    public void reset() {
         this.nbTerritoiresOwned = 0;
     }
 

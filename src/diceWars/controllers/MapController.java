@@ -16,8 +16,8 @@ import java.awt.event.ActionListener;
 
 public class MapController extends AbstractController implements ActionListener {
 
-    private Carte carte;
-    private MapView mapView;
+    private final Carte carte;
+    private final MapView mapView;
 
     public MapController(AbstractModel carte, AbstractView mapView) {
         super(carte, mapView);
@@ -27,7 +27,6 @@ public class MapController extends AbstractController implements ActionListener 
     }
 
     private void setUpMapView() {
-        Color color = null;
         for (int y = -1; y < this.carte.getSize(); y++) {
             for (int x = -1; x < this.carte.getSize(); x++) {
 
@@ -50,8 +49,7 @@ public class MapController extends AbstractController implements ActionListener 
                         this.mapView.getDisplayableViewPanel().add(header);
                     } else {
 
-
-                        if (!this.carte.getTerritoires()[x][y]) {
+                        if (!this.carte.getTerritoires()[y][x]) {
                             UnplayableTerritory unplayableTerritory = new UnplayableTerritory();
                             this.mapView.getDisplayableViewPanel().add(unplayableTerritory);
                         } else {
@@ -69,18 +67,13 @@ public class MapController extends AbstractController implements ActionListener 
                 }
             }
         }
-
-        //TODO Maybe one day
-        //this.paintBackgroundImage();
     }
 
     public void updateMap() {
-        Component component;
         TerritoryView territoryView;
         Coordinates coordinates;
 
-        for (int componentIndex = 0; componentIndex < this.carte.getSize() * this.carte.getSize(); componentIndex++) {
-            component = this.mapView.getDisplayableViewPanel().getComponent(componentIndex);
+        for (Component component : this.mapView.getDisplayableViewPanel().getComponents()) {
             if (component instanceof TerritoryView) {
                 territoryView = (TerritoryView) component;
                 coordinates = territoryView.getCoordinates();
@@ -88,10 +81,6 @@ public class MapController extends AbstractController implements ActionListener 
                 territoryView.setBackground(this.carte.getOwnerTerritoire(coordinates).getColorPlayer());
             }
         }
-    }
-
-    public void reset(){
-        this.carte.reset();
     }
 
     @Override

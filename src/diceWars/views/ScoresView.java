@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
 
 public class ScoresView extends JDialog {
 
-    private static final int DISPLAY_TIME = 3000;
+    private static final int DISPLAY_TIME = 500;
     private static final String ATTACKER_STRING = "Attaquant :";
     private static final String DEFENDER_STRING = "Defenseur :";
 

@@ -16,7 +16,7 @@ public class MapView extends AbstractView {
     public MapView(Carte carte) {
 
         try {
-            BufferedImage grass = ImageIO.read(new FileInputStream("res/textures/grass.jpg"));
+            BufferedImage grass = ImageIO.read(new FileInputStream("res/textures/grass_2.png"));
             ImageIcon icon = new ImageIcon(grass);
             this.imgBackground = icon.getImage();
         } catch (IOException e) {

@@ -3,6 +3,7 @@ package diceWars.controllers;
 import diceWars.DiceWars;
 import diceWars.models.AbstractModel;
 import diceWars.models.Coordinates;
+import diceWars.models.IA;
 import diceWars.models.Jeux;
 import diceWars.models.exceptions.BelongingTerritoryException;
 import diceWars.models.exceptions.NonNeighboringTerritoryException;
@@ -13,13 +14,13 @@ import diceWars.views.DialogError;
 import diceWars.views.GameView;
 import diceWars.views.ScoresView;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.*;
 
 public class GameController extends AbstractController {
 
     private static final String WINNER_MSG = "Joueur %d à gagné ! \n";
     private static final int PLAYER_ID_OFFSET = 1;
+    private static final int THINKING_TIME_IA = 1000;
 
     private final Jeux jeux;
     private final GameView gameView;
@@ -38,30 +39,38 @@ public class GameController extends AbstractController {
                 String.valueOf(GameController.this.jeux.getNextJoueur().getId() + PLAYER_ID_OFFSET)
         );
 
-        this.gameView.getEndRoundButton().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                GameController.this.jeux.endRound();
-
-                if (GameController.this.jeux.isGameNotOver()) {
-                    GameController.this.gameView.getPlayersColor().setBackground(
-                            GameController.this.jeux.getNextJoueur().getColorPlayer()
-                    );
-                    GameController.this.gameView.getTitle_idPlayer().setText(
-                            String.valueOf(GameController.this.jeux.getNextJoueur().getId() + PLAYER_ID_OFFSET)
-                    );
-                    DiceWars.applicationController.getMapController().updateMap();
-                } else {
-                    DiceWars.applicationController.getRankingController().updateRanking();
-                    DiceWars.applicationController.changeView(
-                            DiceWars.applicationController.getRankingController().getView()
-                    );
-                }
-            }
+        this.gameView.getEndRoundButton().addActionListener(actionEvent -> {
+            this.endRoundProcedure();
         });
     }
 
-    private void askNeededCoordinatesToAttack() {
+    private void endRoundProcedure() {
+        GameController.this.jeux.endRound();
+
+        if (GameController.this.jeux.isGameNotOver()) {
+
+            GameController.this.gameView.getPlayersColor().setBackground(
+                    GameController.this.jeux.getNextJoueur().getColorPlayer()
+            );
+            GameController.this.gameView.getTitle_idPlayer().setText(
+                    String.valueOf(GameController.this.jeux.getNextJoueur().getId() + PLAYER_ID_OFFSET)
+            );
+            DiceWars.applicationController.getMapController().updateMap();
+
+            if (this.jeux.getNextJoueur() instanceof IA) {
+                IA ia = (IA) this.jeux.getNextJoueur();
+                this.letsIaPlay(ia);
+            }
+
+        } else {
+            DiceWars.applicationController.getRankingController().updateRanking();
+            DiceWars.applicationController.changeView(
+                    DiceWars.applicationController.getRankingController().getView()
+            );
+        }
+    }
+
+    public void askNeededCoordinatesToAttack() {
 
         try {
 
@@ -105,7 +114,35 @@ public class GameController extends AbstractController {
         }
     }
 
-    public void reset(){
-        this.jeux.reset();
+    private void attackIaProcedure(IA ia) {
+        this.jeux.setAttackingTerritory(ia.chooseAttackingTerritory(this.jeux.getCarte().getTerritoiresOfPlayer(ia)));
+        this.jeux.setAttackedTerritory(ia.chooseTarget(this.jeux.getAttackingTerritory()));
     }
+
+    public void letsIaPlay(IA ia) {
+        this.gameView.freezeView();
+
+        Timer timer = new Timer(THINKING_TIME_IA, arg0 -> {
+
+            this.attackIaProcedure(ia);
+
+            if (this.jeux.getAttackedTerritory() != null) {
+
+                GameController.this.askNeededCoordinatesToAttack();
+                DiceWars.applicationController.getMapController().updateMap();
+                //Prepare for next acquisition
+                GameController.this.jeux.setAttackingTerritory(null);
+
+                this.letsIaPlay(ia);
+            } else {
+                this.endRoundProcedure();
+                this.gameView.unfreezeView();
+            }
+
+        });
+
+        timer.setRepeats(false);
+        timer.start();
+    }
+
 }

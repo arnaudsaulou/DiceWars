@@ -3,7 +3,6 @@ package diceWars.controllers;
 import diceWars.DiceWars;
 import diceWars.models.AbstractModel;
 import diceWars.models.Jeux;
-import diceWars.models.Partie;
 import diceWars.models.Ranking;
 import diceWars.views.AbstractView;
 import diceWars.views.RankingView;
@@ -31,13 +30,6 @@ public class RankingController extends AbstractController {
             }
         });
 
-        this.rankingView.getRestart().addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                DiceWars.applicationController.resetPartie();
-                DiceWars.applicationController.lunchPartie(Partie.MODE.SOLO, -1);
-            }
-        });
     }
 
     private String[][] constructRankinObject() {
@@ -53,6 +45,9 @@ public class RankingController extends AbstractController {
     }
 
     public void updateRanking() {
+
+        JScrollPane scrollPane = new JScrollPane();
+
         String[] columnNames = {"Joueur", "Nombre de territoires"};
 
         JTable jTable = new JTable(this.constructRankinObject(), columnNames);
@@ -60,7 +55,9 @@ public class RankingController extends AbstractController {
         jTable.setRowHeight(50);
         jTable.setFont(new Font("ARIAL", Font.PLAIN, 20));
 
-        this.rankingView.getCenterPanel().add(jTable, BorderLayout.CENTER);
+        scrollPane.setViewportView(jTable);
+
+        this.rankingView.getCenterPanel().add(scrollPane, BorderLayout.CENTER);
 
         Jeux jeux = (Jeux) DiceWars.applicationController.getGameController().getModel();
         this.rankingView.getWinnerName().setText("Joueur " + (jeux.getLastWinner().getId() + 1));

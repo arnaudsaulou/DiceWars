@@ -16,51 +16,39 @@ public class ApplicationController {
     private MapController mapController;
     private RankingController rankingController;
 
-    private Partie partie;
 
     public ApplicationController() {
         this.applicationView = new ApplicationView();
         this.menuController = new MenuController(null, new MenuView());
     }
 
-    private void setUpPartie(int nbPlayer) throws IllegalStateException {
+    private void setUpPartie(int nbPlayer, Partie.MODE mode) throws IllegalStateException {
 
-        this.partie = new Partie(nbPlayer);
+        Partie partie = new Partie(nbPlayer, mode);
 
         this.mapController = new MapController(
-                this.partie.getJeux().getCarte(),
-                new MapView(this.partie.getJeux().getCarte())
+                partie.getJeux().getCarte(),
+                new MapView(partie.getJeux().getCarte())
         );
 
         this.gameController = new GameController(
-                this.partie.getJeux(),
+                partie.getJeux(),
                 new GameView((MapView) this.mapController.getView())
         );
 
         this.rankingController = new RankingController(
-                new Ranking(new Comparator<Joueur>() {
+                new Ranking(new Comparator<>() {
                     @Override
                     public int compare(Joueur joueur, Joueur otherJoueur) {
                         return joueur.getNbTerritoiresOwned() - otherJoueur.getNbTerritoiresOwned();
                     }
-                }, this.partie.getJoueurs()),
+                }, partie.getJoueurs()),
                 new RankingView()
         );
     }
 
-
-    public void resetPartie() {
-        this.mapController.reset();
-        this.gameController.reset();
-        this.mapController.updateMap();
-    }
-
     public void lunchPartie(Partie.MODE mode, int nbPlayer) throws IllegalStateException {
-        if (nbPlayer == -1) {
-            this.setUpPartie(this.partie.getJoueurs().size());
-        } else {
-            this.setUpPartie(nbPlayer);
-        }
+        this.setUpPartie(nbPlayer, mode);
         this.changeView(this.gameController.getView());
     }
 

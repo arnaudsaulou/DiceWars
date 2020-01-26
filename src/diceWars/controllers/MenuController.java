@@ -13,7 +13,7 @@ import java.awt.event.MouseListener;
 
 public class MenuController extends AbstractController implements MouseListener {
 
-    private MenuView menuView;
+    private final MenuView menuView;
 
     public MenuController(AbstractModel abstractModel, AbstractView menuView) {
         super(abstractModel, menuView);
@@ -38,7 +38,7 @@ public class MenuController extends AbstractController implements MouseListener 
 
         //Lancer le jeu en solo
         if (e.getSource() == this.menuView.getJLabelJouerSolo()) {
-            DiceWars.applicationController.lunchPartie(Partie.MODE.SOLO, 2);
+            DiceWars.applicationController.lunchPartie(Partie.MODE.SOLO, 1);
         }
 
         //Lancer le jeu en duo

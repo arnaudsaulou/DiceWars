@@ -11,23 +11,30 @@ public class Partie extends AbstractModel {
 
     public enum MODE {SOLO, MULTI}
 
-    public static Color[] COLOR = {Color.BLUE, Color.GREEN, Color.RED, Color.MAGENTA, Color.ORANGE, Color.PINK, Color.YELLOW};
-    public static Set<Color> COLOR_USED = new HashSet<>();
+    public static final Color[] COLOR = {Color.BLUE, Color.GREEN, Color.RED, Color.MAGENTA, Color.ORANGE, Color.PINK, Color.YELLOW};
+    public static final Set<Color> COLOR_USED = new HashSet<>();
 
     //endregion
 
     //region Variables
 
-    private MODE mode;
-    private Jeux jeux;
-    private ArrayList<Joueur> joueurs;
+    private final MODE mode;
+    private final Jeux jeux;
+    private final ArrayList<Joueur> joueurs;
 
     //endregion
 
-    public Partie(int nbPlayer) throws IllegalStateException {
-        Carte carte = new Carte(25, (float) 0.5, nbPlayer);
+    public Partie(int nbPlayer, MODE mode) throws IllegalStateException {
+        this.mode = mode;
+
         this.joueurs = initializeJoueurs(nbPlayer);
-        this.jeux = new Jeux(carte, joueurs);
+
+        if (this.mode.equals(MODE.SOLO)) {
+            nbPlayer += 1;
+            this.joueurs.add(new IA());
+        }
+
+        this.jeux = new Jeux(new Carte(nbPlayer), joueurs);
     }
 
     //region Utils
@@ -38,7 +45,7 @@ public class Partie extends AbstractModel {
 
         if (nbPlayer <= COLOR.length) {
             for (int i = 0; i < nbPlayer; i++) {
-                listJoueur.add(new Joueur(this.jeux));
+                listJoueur.add(new Joueur());
             }
         } else {
             throw new IllegalStateException("Trop de joueur (max : " + COLOR.length + ")");
@@ -55,6 +62,7 @@ public class Partie extends AbstractModel {
     }
 
     public ArrayList<Joueur> getJoueurs() {
-        return joueurs;
+        return this.joueurs;
     }
+
 }

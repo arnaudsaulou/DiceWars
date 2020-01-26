@@ -1,19 +1,19 @@
 package diceWars.models;
 
-import javafx.collections.transformation.SortedList;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 
-import java.util.*;
-
-public class Ranking extends AbstractModel implements Iterable<Joueur> {
+public class Ranking extends AbstractModel {
 
     //region Variables
 
-    private ArrayList<Joueur> joueurList;
+    private final ArrayList<Joueur> joueurList;
 
     //endregion
 
     public Ranking(Comparator<Joueur> order, Collection<Joueur> collection) {
-        this.joueurList = new ArrayList<Joueur>();
+        this.joueurList = new ArrayList<>();
         this.joueurList.addAll(collection);
         this.joueurList.sort(order);
     }
@@ -22,8 +22,4 @@ public class Ranking extends AbstractModel implements Iterable<Joueur> {
         return joueurList;
     }
 
-    @Override
-    public Iterator<Joueur> iterator() {
-        return null;
-    }
 }

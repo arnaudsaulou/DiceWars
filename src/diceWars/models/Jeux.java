@@ -104,10 +104,9 @@ public class Jeux extends AbstractModel {
 
         //Choose a number of dice to allocate per joueur
         int nbDicePerJoueur = Math.max(random.nextInt(carte.getNbTerritoiresPlayable() * NB_MAX_DICE_PER_TERRITOIRES)
-                / this.joueurs.size(), carte.getNbTerritoiresPlayable());
+                / this.nbJoueurs, carte.getNbTerritoiresPlayable());
 
         setupTerritoireForeachJoueur(nbTerritoiresPerJoueur, nbDicePerJoueur);
-
     }
 
     /**
@@ -186,7 +185,7 @@ public class Jeux extends AbstractModel {
      */
     private void associateTerritoireWithJoueurOrNot(Joueur joueur, ArrayList<Integer> diceByTerritoire, int x, int y) {
         //If the territory can be played and the territory has no owner and the random is true
-        if (carte.getTerritoires()[x][y] &&
+        if (carte.getTerritoires()[y][x] &&
                 random.nextBoolean() &&
                 carte.getOwnerTerritoire(new Coordinates(x, y)) == null) {
 
@@ -269,7 +268,7 @@ public class Jeux extends AbstractModel {
     public void endRound() {
         int supportDices = this.carte.getMaxContiguousTerritories(this.nextJoueur);
         this.distributeSupportDices(this.nextJoueur, supportDices);
-        this.nextJoueur = this.joueurs.get((this.joueurs.indexOf(this.nextJoueur) + 1) % this.joueurs.size());
+        this.nextJoueur = this.joueurs.get((this.joueurs.indexOf(this.nextJoueur) + 1) % this.nbJoueurs);
     }
 
     /**
@@ -318,20 +317,6 @@ public class Jeux extends AbstractModel {
 
     protected void checkIsGameOver(Joueur joueur) {
         this.isGameOver = carte.getNbTerritoiresPlayable() == carte.getTerritoiresOfPlayer(joueur).size();
-    }
-
-    public void reset() {
-        for (Joueur joueur : joueurs) {
-            joueur.reset();
-        }
-
-        this.allocateTerritoires();
-
-        this.isGameOver = false;
-        this.attackingTerritory = null;
-        this.attackedTerritory = null;
-        this.lastWinner = null;
-        this.nextJoueur = this.joueurs.get(0);
     }
 
     //endregion

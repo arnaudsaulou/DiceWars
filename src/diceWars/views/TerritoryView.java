@@ -4,8 +4,6 @@ import diceWars.models.Coordinates;
 
 import javax.swing.*;
 import java.awt.*;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 
 public class TerritoryView extends JButton {
 
@@ -18,7 +16,6 @@ public class TerritoryView extends JButton {
     //region Variables
 
     private final Coordinates coordinates;
-    private String text;
 
     //endregion
 

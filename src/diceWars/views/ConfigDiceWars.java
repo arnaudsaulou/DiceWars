@@ -66,7 +66,7 @@ public class ConfigDiceWars extends JDialog {
         jButtonValidate.requestFocus();
         jButtonValidate.addActionListener(e -> {
             nbJoueur = Integer.parseInt(jTextFieldNbJoueur.getText());
-            if (nbJoueur > 2) {
+            if (nbJoueur > 1) {
                 try {
                     DiceWars.applicationController.lunchPartie(Partie.MODE.MULTI, nbJoueur);
                     ConfigDiceWars.this.dispose();

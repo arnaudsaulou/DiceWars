@@ -5,7 +5,7 @@ import diceWars.views.AbstractView;
 
 public abstract class AbstractController {
 
-    private AbstractModel abstractModel;
+    private final AbstractModel abstractModel;
     private AbstractView abstractView;
 
     public AbstractController(AbstractModel abstractModel, AbstractView abstractView) {
@@ -21,7 +21,4 @@ public abstract class AbstractController {
         return this.abstractView;
     }
 
-    public void setView(AbstractView abstractView) {
-        this.abstractView = abstractView;
-    }
 }

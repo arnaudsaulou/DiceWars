@@ -1,9 +1,8 @@
 package diceWars.models;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Random;
+import diceWars.DiceWars;
+
+import java.util.*;
 
 public class Carte extends AbstractModel {
 
@@ -20,15 +19,17 @@ public class Carte extends AbstractModel {
 
     //region Constructor
 
-    public Carte(int size, float density, int nbPlayer) {
-        this.size = size;
-        this.density = density;
+    public Carte(int nbPlayer) {
+        this.size = DiceWars.getSize();
+        this.density = DiceWars.getDensity();
         this.territoires = new boolean[this.size][this.size];
         this.nbDiceByTerritoire = new HashMap<>();
         this.ownerTerritoire = new HashMap<>();
         this.random = new Random();
-        this.createMap(0, null);
+
+        this.createMap(new Coordinates(this.random.nextInt(this.size), this.random.nextInt(this.size)));
         this.verifyMap(nbPlayer);
+
     }
 
     //endregion
@@ -36,99 +37,86 @@ public class Carte extends AbstractModel {
     //region Utils
 
     private void verifyMap(int nbPlayer) {
-        if (this.getNbTerritoiresPlayable() < nbPlayer) {
-            throw new IllegalStateException("Plus de joueur que de territoires");
-        } else if (this.getNbTerritoiresPlayable() % nbPlayer != 0) {
-            throw new IllegalStateException("Pas multiple");
-            //TODO Add or remove territories
-
-        }
-    }
-
-    private void createMap(int pass, ArrayList<Coordinates> lastPassPlayableTerritories) {
-
-        if (pass < this.size) {
-
-            HashSet<Coordinates> surroundingTerritories = new HashSet<>();
-
-            if (lastPassPlayableTerritories != null) {
-                for (Coordinates territoire : lastPassPlayableTerritories) {
-                    surroundingTerritories.addAll(getSurroundingTerritories(territoire));
+        if (this.getNbTerritoiresPlayable() < nbPlayer || this.getNbTerritoiresPlayable() % nbPlayer != 0) {
+            try {
+                for (boolean[] territoire : this.territoires) {
+                    Arrays.fill(territoire, false);
                 }
+                this.createMap(new Coordinates(this.random.nextInt(this.size), this.random.nextInt(this.size)));
+                this.verifyMap(nbPlayer);
+            } catch (StackOverflowError e) {
+                System.gc();
             }
-
-            ArrayList<Coordinates> potentialPlayableTerritories =
-                    this.potentialPlayableTerritories(new Coordinates(pass, pass), surroundingTerritories);
-
-            ArrayList<Coordinates> playableTerritories =
-                    this.distributePlayableTerritories(potentialPlayableTerritories);
-
-            pass = pass + 1;
-            this.createMap(pass, playableTerritories);
         }
     }
 
-    private ArrayList<Coordinates> potentialPlayableTerritories(
-            Coordinates startingPoint, HashSet<Coordinates> surroundingTerritories) {
+    /*private void createMap() {
 
-        ArrayList<Coordinates> potentialPlayableTerritories = new ArrayList<>();
-        potentialPlayableTerritories.add(startingPoint);
-
-        int x = startingPoint.getX();
-        int y = startingPoint.getY();
-
-        while (x > 0) {
-            x = x - 1;
-            potentialPlayableTerritories.add(new Coordinates(x, startingPoint.getY()));
-        }
-
-        while (y > 0) {
-            y = y - 1;
-            potentialPlayableTerritories.add(new Coordinates(startingPoint.getX(), y));
-        }
-
-
-        if (surroundingTerritories.size() > 0) {
-            HashSet<Coordinates> oneMustBePlayable = new HashSet<>(potentialPlayableTerritories);
-            oneMustBePlayable.retainAll(surroundingTerritories);
-            return new ArrayList<>(oneMustBePlayable);
-        } else {
-            return potentialPlayableTerritories;
-        }
-
-
-    }
-
-    private ArrayList<Coordinates> distributePlayableTerritories(
-            ArrayList<Coordinates> potentialPlayableTerritories) {
+        int remove = 0;
 
         ArrayList<Coordinates> playableTerritories = new ArrayList<>();
+        ArrayList<Coordinates> visitedTerritories = new ArrayList<>();
 
-        boolean aSurroundingTerritoryIsAccessible = false;
-        boolean createTerritory;
-        for (Coordinates territory : potentialPlayableTerritories) {
-            createTerritory = createTerritoryOrNot();
-
-            if (createTerritory) {
-                this.territoires[territory.getX()][territory.getY()] = true;
-                aSurroundingTerritoryIsAccessible = true;
-                playableTerritories.add(territory);
+        for (int y = 0; y < this.territoires.length; y++) {
+            for (int x = 0; x < this.territoires[y].length; x++) {
+                this.territoires[y][x] = true;
+                playableTerritories.add(new Coordinates(x, y));
             }
         }
 
-        if (!aSurroundingTerritoryIsAccessible) {
-            Coordinates designatedTerritory =
-                    potentialPlayableTerritories.get(this.random.nextInt(potentialPlayableTerritories.size()));
+        int totalNbTerritories = this.size * this.size;
+        int nbTerritoriesToRemove = (int) (totalNbTerritories - (totalNbTerritories * this.density));
 
-            this.territoires[designatedTerritory.getX()][designatedTerritory.getY()] = true;
-            playableTerritories.add(designatedTerritory);
+        System.out.println("totalNbTerritories : " + totalNbTerritories);
+        System.out.println("nbTerritoriesToRemove : " + nbTerritoriesToRemove);
+
+        while (nbTerritoriesToRemove > 0) {
+
+            Coordinates designatedTerritory = playableTerritories.get(this.random.nextInt(playableTerritories.size()));
+            visitedTerritories.add(designatedTerritory);
+            HashSet<Coordinates> neighborsPlayable = this.getNeighborsPlayable(designatedTerritory);
+
+            System.out.println(nbTerritoriesToRemove);
+
+
+            for (Coordinates neighbor : neighborsPlayable) {
+                HashSet<Coordinates> neighborsPlayableOfNeighborsPlayable = this.getNeighborsPlayable(neighbor);
+                neighborsPlayableOfNeighborsPlayable.removeAll(visitedTerritories);
+
+                if (neighborsPlayableOfNeighborsPlayable.size() > 2) {
+                    remove++;
+                    //System.out.println(remove);
+                    this.territoires[designatedTerritory.getY()][designatedTerritory.getX()] = false;
+                    playableTerritories.remove(designatedTerritory);
+                    nbTerritoriesToRemove--;
+                    break;
+                }
+
+            }
         }
 
-        return playableTerritories;
-    }
+        System.out.println(this);
+    }*/
 
-    private boolean createTerritoryOrNot() {
-        return this.random.nextFloat() <= this.density;
+
+    private void createMap(Coordinates startingPoint) {
+
+        ArrayList<Coordinates> surroundingTerritories = this.getSurroundingTerritories(startingPoint);
+        surroundingTerritories.removeAll(this.getNeighborsPlayable(startingPoint));
+
+        if (!surroundingTerritories.isEmpty()) {
+            this.territoires[startingPoint.getY()][startingPoint.getX()] = true;
+
+            int index = (this.random.nextInt(surroundingTerritories.size()));
+            Coordinates nextTerritory = surroundingTerritories.get(index);
+
+            for (Coordinates designatedTerritory : surroundingTerritories) {
+
+                if (this.getNeighborsPlayable(designatedTerritory).size() < Math.min((this.density * 10), 9)) {
+                    this.createMap(nextTerritory);
+                }
+            }
+        }
     }
 
     /**
@@ -142,12 +130,7 @@ public class Carte extends AbstractModel {
                 coordinates.getX() < this.size &&
                 coordinates.getY() >= 0 &&
                 coordinates.getY() < this.size &&
-                this.getTerritoires()[coordinates.getX()][coordinates.getY()];
-    }
-
-    public void reset() {
-        this.nbDiceByTerritoire.clear();
-        this.ownerTerritoire.clear();
+                this.getTerritoires()[coordinates.getY()][coordinates.getX()];
     }
 
     //endregion
@@ -161,7 +144,7 @@ public class Carte extends AbstractModel {
      * @param nbDice                Number of dices to set
      */
     protected void setNbDiceOnTerritoire(Coordinates coordinatesTerritoire, int nbDice) {
-        this.nbDiceByTerritoire.remove(coordinatesTerritoire);
+        //this.nbDiceByTerritoire.remove(coordinatesTerritoire);
         this.nbDiceByTerritoire.put(coordinatesTerritoire, nbDice);
     }
 
@@ -180,8 +163,8 @@ public class Carte extends AbstractModel {
 
     //region Getter
 
-    protected HashSet<Coordinates> getSurroundingTerritories(Coordinates coordinatesTerritoire) {
-        HashSet<Coordinates> neighbours = new HashSet<>();
+    protected ArrayList<Coordinates> getSurroundingTerritories(Coordinates coordinatesTerritoire) {
+        ArrayList<Coordinates> surrounding = new ArrayList<>();
 
         int row = coordinatesTerritoire.getY();
         int column = coordinatesTerritoire.getX();
@@ -192,14 +175,14 @@ public class Carte extends AbstractModel {
             //Search left, in the middle and right
             for (int x = Math.max(0, column - 1); x <= Math.min(this.size - 1, column + 1); x++) {
 
-                //If it's not the origin territory and the terittoires is playable
-                if ((x != column || y != row)) {
-                    neighbours.add(new Coordinates(x, y));
+                //If it's not the origin territory
+                if (x != column || y != row) {
+                    surrounding.add(new Coordinates(x, y));
                 }
             }
         }
 
-        return neighbours;
+        return surrounding;
     }
 
     /**
@@ -221,7 +204,7 @@ public class Carte extends AbstractModel {
             for (int x = Math.max(0, column - 1); x <= Math.min(this.size - 1, column + 1); x++) {
 
                 //If it's not the origin territory and the terittoires is playable
-                if ((x != column || y != row) && this.territoires[x][y]) {
+                if ((x != column || y != row) && this.territoires[y][x]) {
                     neighbours.add(new Coordinates(x, y));
                 }
             }
@@ -236,7 +219,7 @@ public class Carte extends AbstractModel {
      * @param joueur The player
      * @return The list of territories owned
      */
-    protected ArrayList<Coordinates> getTerritoiresOfPlayer(Joueur joueur) {
+    public ArrayList<Coordinates> getTerritoiresOfPlayer(Joueur joueur) {
 
         ArrayList<Coordinates> territoiresOfPlayer = new ArrayList<>();
 
@@ -276,8 +259,8 @@ public class Carte extends AbstractModel {
      * @param territoiresVisited    The list of territories already visited
      * @return The number of contiguous territories around the starting territory
      */
-    private int computeContiguousTerritories(Coordinates
-                                                     coordinatesTerritoire, HashSet<Coordinates> territoiresVisited) {
+    private int computeContiguousTerritories(
+            Coordinates coordinatesTerritoire, HashSet<Coordinates> territoiresVisited) {
 
         int maxContiguousTerritories = 0;
 
@@ -363,10 +346,10 @@ public class Carte extends AbstractModel {
 
         for (int y = 0; y < this.size; y++) {
             for (int x = 0; x < this.size; x++) {
-                if (this.territoires[x][y]) {
-                    stringBuilder.append(this.ownerTerritoire.get(new Coordinates(x, y)).getId());
+                if (this.territoires[y][x]) {
+                    //stringBuilder.append(this.ownerTerritoire.get(new Coordinates(x, y)).getId());
                     stringBuilder.append(" - ");
-                    stringBuilder.append(this.nbDiceByTerritoire.get(new Coordinates(x, y)));
+                    //stringBuilder.append(this.nbDiceByTerritoire.get(new Coordinates(x, y)));
                 } else {
                     stringBuilder.append("  #  ");
                 }

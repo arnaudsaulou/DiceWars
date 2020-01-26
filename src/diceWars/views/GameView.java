@@ -18,6 +18,27 @@ public class GameView extends AbstractView {
         this.mapViewPanel.add(mapView.getDisplayableViewPanel(), BorderLayout.CENTER);
     }
 
+    public void freezeView() {
+        this.setEnableRec(this.gameViewPanel, false);
+    }
+
+    public void unfreezeView() {
+        this.setEnableRec(this.gameViewPanel, true);
+    }
+
+    private void setEnableRec(Component container, boolean enable) {
+        container.setEnabled(enable);
+
+        try {
+            Component[] components = ((Container) container).getComponents();
+            for (Component component : components) {
+                setEnableRec(component, enable);
+            }
+        } catch (ClassCastException ignored) {
+
+        }
+    }
+
     public JButton getEndRoundButton() {
         return this.endRoundButton;
     }
