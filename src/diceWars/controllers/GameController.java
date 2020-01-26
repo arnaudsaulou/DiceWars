@@ -46,9 +46,7 @@ public class GameController extends AbstractController {
         this.displayTitle();
 
         //Register a listener on the "Fin du tour" button
-        this.gameView.getEndRoundButton().addActionListener(actionEvent -> {
-            this.endRoundProcedure();
-        });
+        this.gameView.getEndRoundButton().addActionListener(actionEvent -> this.endRoundProcedure());
     }
 
     //endregion
@@ -132,10 +130,10 @@ public class GameController extends AbstractController {
      *
      * @param coordinatesAttacking The territory attacking
      * @param coordinatesAttacked  The territory attacked
-     * @throws BelongingTerritoryException
-     * @throws NonNeighboringTerritoryException
-     * @throws OneDiceTerritoryException
-     * @throws NotBelongingTerritoryException
+     * @throws BelongingTerritoryException      BelongingTerritoryException
+     * @throws NonNeighboringTerritoryException NonNeighboringTerritoryException
+     * @throws OneDiceTerritoryException        NonNeighboringTerritoryException
+     * @throws NotBelongingTerritoryException   NotBelongingTerritoryException
      */
     private void executeAnAttack(Coordinates coordinatesAttacking, Coordinates coordinatesAttacked)
             throws BelongingTerritoryException, NonNeighboringTerritoryException, OneDiceTerritoryException,
@@ -171,6 +169,7 @@ public class GameController extends AbstractController {
             DiceWars.applicationController.getMapController().updateMap();
 
             //Prepare for next acquisition
+            this.jeux.setAttackedTerritory(null);
             this.jeux.setAttackingTerritory(null);
         }
     }
@@ -205,14 +204,17 @@ public class GameController extends AbstractController {
             if (this.jeux.getAttackedTerritory() != null) {
 
                 //Attack and update the view
-                GameController.this.askNeededCoordinatesToAttack();
+                this.askNeededCoordinatesToAttack();
                 DiceWars.applicationController.getMapController().updateMap();
 
                 //Prepare for next acquisition
-                GameController.this.jeux.setAttackingTerritory(null);
+                this.jeux.setAttackedTerritory(null);
+                this.jeux.setAttackingTerritory(null);
 
                 this.letsIaPlay(ia);
             } else {
+                this.jeux.setAttackedTerritory(null);
+                this.jeux.setAttackingTerritory(null);
 
                 //End round and re-enable interactions with the view
                 this.endRoundProcedure();

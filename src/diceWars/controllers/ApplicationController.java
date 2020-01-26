@@ -59,12 +59,7 @@ public class ApplicationController {
 
         //Setting up a corresponding RankingController
         this.rankingController = new RankingController(
-                new Ranking(new Comparator<>() {
-                    @Override
-                    public int compare(Joueur joueur, Joueur otherJoueur) {
-                        return joueur.getNbTerritoiresOwned() - otherJoueur.getNbTerritoiresOwned();
-                    }
-                }, partie.getJoueurs()),
+                new Ranking(Comparator.comparingInt(Joueur::getNbTerritoiresOwned), partie.getJoueurs()),
                 new RankingView()
         );
     }

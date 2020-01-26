@@ -11,7 +11,7 @@ public abstract class AbstractController {
     //region Variables
 
     private final AbstractModel abstractModel;
-    private AbstractView abstractView;
+    private final AbstractView abstractView;
 
     //endregion
 

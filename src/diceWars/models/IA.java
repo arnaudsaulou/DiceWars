@@ -71,7 +71,7 @@ public class IA extends Joueur {
                 //Decide the best target, lower point (minimize defeat risk)
                 for (Coordinates chosenOne : potentialTarget) {
                     nbDiceOnTerritory = this.jeux.getCarte().getNbDiceOnTerritoire(chosenOne);
-                    if (nbDiceOnTerritory < minNbDice) {
+                    if (nbDiceOnTerritory <= minNbDice) {
                         minNbDice = nbDiceOnTerritory;
                         targetTerritory = chosenOne;
                     }

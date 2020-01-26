@@ -59,7 +59,6 @@ public class Partie extends AbstractModel {
         return listJoueur;
     }
 
-
     //endregion
 
     //region Getter

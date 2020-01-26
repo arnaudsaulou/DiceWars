@@ -102,14 +102,19 @@ public class Jeux extends AbstractModel {
      */
     private void allocateTerritoires() {
 
-        //Compute the number of territory to allocate per joueur
-        int nbTerritoiresPerJoueur = carte.getNbTerritoiresPlayable() / this.nbJoueurs;
+        if (carte.getNbTerritoiresPlayable() > 0) {
 
-        //Choose a number of dice to allocate per joueur
-        int nbDicePerJoueur = Math.max(random.nextInt(carte.getNbTerritoiresPlayable() * NB_MAX_DICE_PER_TERRITOIRES)
-                / this.nbJoueurs, carte.getNbTerritoiresPlayable());
+            //Compute the number of territory to allocate per joueur
+            int nbTerritoiresPerJoueur = carte.getNbTerritoiresPlayable() / this.nbJoueurs;
 
-        setupTerritoireForeachJoueur(nbTerritoiresPerJoueur, nbDicePerJoueur);
+            //Choose a number of dice to allocate per joueur
+            int nbDicePerJoueur = Math.max(random.nextInt(carte.getNbTerritoiresPlayable() * NB_MAX_DICE_PER_TERRITOIRES)
+                    / this.nbJoueurs, carte.getNbTerritoiresPlayable());
+
+            setupTerritoireForeachJoueur(nbTerritoiresPerJoueur, nbDicePerJoueur);
+        } else {
+            throw new IllegalStateException("Densité trop faible");
+        }
     }
 
     /**
@@ -297,7 +302,7 @@ public class Jeux extends AbstractModel {
         if (scoreTerritoireAttaquant > scoreTerritoireAttaque) {
             this.updateNbTerritoryOwned(joueur, carte.getOwnerTerritoire(coordinatesTerritoireAttaque));
 
-            carte.setNbDiceOnTerritoire(coordinatesTerritoireAttaque, nbDiceOnTerritoireAttaque + nbDiceOnTerritoireAttaquant - 1);
+            carte.setNbDiceOnTerritoire(coordinatesTerritoireAttaque, nbDiceOnTerritoireAttaquant - 1);
             carte.setOwnerTerritoire(coordinatesTerritoireAttaque, joueur);
             this.lastWinner = joueur;
         } else {
